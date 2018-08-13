@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/signup_email_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/light_green_to_dark_green_1"
+    tools:context=".controller.login.SignupDetailsFragment">
+
+    <ProgressBar
+        android:id="@+id/signupProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:elevation="15dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/light_green_to_dark_green_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/signupBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@null"
+            android:drawableStart="@drawable/right_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="75dp"
+            android:layout_marginStart="75dp"
+            android:layout_marginTop="14dp"
+            android:text="JOHN APPLESEED"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/uploadPicture" />
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:text="johnappeseed@gmail.com"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name" />
+
+
+        <ImageButton
+            android:id="@+id/uploadPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="140dp"
+            android:layout_marginStart="140dp"
+            android:paddingStart="45dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <!--android:background="@drawable/upload_btn_charac"-->
+        <!--android:drawableStart="@drawable/photo"-->
+
+        <EditText
+            android:id="@+id/DOB"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="22dp"
+            android:hint="Date of Birth"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/email" />
+
+
+        <Spinner
+            android:id="@+id/gender"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:entries="@array/gender"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/DOB"/>
+
+        <EditText
+            android:id="@+id/phonenumber"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:hint="Phone Number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gender" />
+
+        <EditText
+            android:id="@+id/CNIC"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:hint="CNIC"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/phonenumber" />
+
+        <Button
+            android:id="@+id/signup_submit_btn"
+            style="@style/radius"
+            android:layout_width="107dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="73dp"
+            android:layout_marginEnd="148dp"
+            android:layout_marginStart="148dp"
+            android:text="SUBMIT"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.473"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/CNIC" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>

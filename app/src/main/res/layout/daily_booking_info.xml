@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:layout_marginStart="10dp">
+
+
+    <TextView
+        android:id="@+id/venue_specific"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="303dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:drawableLeft="@drawable/ic_pin_drop_black_24dp"
+        android:text="Model Town Whites"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/from_Time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:text="12:00"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/hyp"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
+
+
+    <TextView
+        android:id="@+id/hyp"
+        android:layout_width="6dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="-"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/to_Time"
+        app:layout_constraintStart_toEndOf="@+id/from_Time"
+        app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
+
+    <TextView
+        android:id="@+id/to_Time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="176dp"
+        android:text="03:00"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/hyp"
+        app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
+
+    <TextView
+        android:id="@+id/AMPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="96dp"
+        android:text="AM"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/StatusText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
+
+
+    <TextView
+        android:id="@+id/by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="16dp"
+        android:text="by"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/user_Name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from_Time"
+        app:layout_constraintVertical_bias="0.2" />
+
+
+    <TextView
+        android:id="@+id/StatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="150dp"
+        android:text="Status:"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/divider"
+        app:layout_constraintStart_toEndOf="@+id/user_Name"
+        app:layout_constraintTop_toBottomOf="@+id/AMPM" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="23dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginStart="4dp"
+        android:text="Booked"
+        android:textColor="@color/green"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/StatusText"
+        app:layout_constraintTop_toBottomOf="@+id/AMPM"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+        <View
+            android:id="@+id/divider"
+            style="@style/Divider"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/StatusText" />
+
+    <TextView
+        android:id="@+id/user_Name"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="4dp"
+        android:text="Ahmad Ali"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/by"
+        app:layout_constraintTop_toBottomOf="@+id/from_Time"
+        app:layout_constraintVertical_bias="0.416" />
+
+
+    </android.support.constraint.ConstraintLayout>
+

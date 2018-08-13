@@ -1,0 +1,51 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+
+    <style name="calendar" parent="Theme.AppCompat.Light.Dialog">
+
+        <item name="colorAccent">#42DE95</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:color">@color/black</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="radius">
+        <item name="android:background">@drawable/radius</item>
+    </style>
+
+    <style name="book_btn" parent="Theme.AppCompat">
+        <item name="android:background">@drawable/receipt_background</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:fontFamily">Raleway</item>
+        <item name="android:textColor">@color/white</item>
+
+    </style>
+
+    <style name="email_password_login">
+        <item name="android:fontFamily">@font/montserrat_regular</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:background">@drawable/radius</item>
+    </style>
+
+    <style name="DatePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">#42DE95</item>
+
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>
