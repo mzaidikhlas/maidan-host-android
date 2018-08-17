@@ -25,9 +25,10 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        mAuth.signOut()
         val currentUser = mAuth.currentUser
         if (currentUser != null){
-            updateUI(currentUser)
+            updateUI()
         }
     }
 
@@ -52,10 +53,11 @@ class LoginActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
                 val user = FirebaseAuth.getInstance().currentUser
-//                Log.d("User", user!!.displayName)
-                updateUI(user!!)
+                Log.d("User", user.toString())
+                updateUI()
                 // ...
             } else {
+                    throw response!!.error!!
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check
                 // response.getError().getErrorCode() and handle the error.
@@ -63,9 +65,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-    private fun updateUI(user: FirebaseUser){
+    private fun updateUI(){
         val mainActivity = Intent(this, MainActivity::class.java)
-        mainActivity.putExtra("user", user)
         startActivity(mainActivity)
     }
 }

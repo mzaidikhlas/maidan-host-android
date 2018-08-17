@@ -1,6 +1,5 @@
 package com.maidan.android.host.controller
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -11,14 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
-import com.maidan.android.host.LoginActivity
 import com.maidan.android.host.adaptor.BookingInfoAdaptor
-import com.maidan.android.host.models.BookingInfo
 import com.maidan.android.host.R
-import com.maidan.android.host.adaptor.DateBookingAdapter
 import com.maidan.android.host.models.Booking
 import com.maidan.android.host.models.User
 import com.maidan.android.host.models.Venue
@@ -26,13 +24,11 @@ import com.maidan.android.host.retrofit.ApiInterface
 import com.maidan.android.host.retrofit.ApiResponse
 import com.maidan.android.host.retrofit.PayloadFormat
 import com.maidan.android.host.retrofit.RetrofitClient
-import kotlinx.android.synthetic.main.popup_add_booking.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.log
 
 
 class HomeFragment : Fragment() {
@@ -41,7 +37,10 @@ class HomeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var homeCalender: CalendarView
+    private lateinit var progressBar: ProgressBar
     private lateinit var dateString: String
+    private var venueName = "Model Town"
+    private lateinit var displayBookings: ArrayList<Booking>
 
     //Firebase
     private lateinit var mAuth: FirebaseAuth
@@ -58,6 +57,8 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.activity_booking_initial, container, false)
 
+        progressBar = view.findViewById(R.id.bookingProgressBar)
+
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
         val c: Calendar = Calendar.getInstance()
@@ -70,19 +71,18 @@ class HomeFragment : Fragment() {
         homeCalender.setOnDateChangeListener { calenderView, y, m, d ->
             dateString = "$d/$m/$y"
             Log.d(TAG, dateString)
-
+            progressBar.visibility = View.VISIBLE
             val dailyBookingFragment = DailyBookingFragment()
             val bundle = Bundle()
             bundle.putString("date", dateString)
-            bundle.putSerializable("venues", venues)
-            bundle.putSerializable("user", user)
+//            bundle.putSerializable("venues", venues)
+//            bundle.putSerializable("user", user)
             dailyBookingFragment.arguments = bundle
+            progressBar.visibility = View.INVISIBLE
             fragmentManager!!.beginTransaction().replace(R.id.fragment_layout, dailyBookingFragment).commit()
         }
         homeCalender.minDate = c.timeInMillis
         Log.d(TAG, dateString)
-
-        bookings = ArrayList()
 
         getBookingsWithOwner()
 
@@ -93,7 +93,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun getBookingsWithOwner() {
-
+        progressBar.visibility = View.VISIBLE
         currentUser.getIdToken(true).addOnCompleteListener{task ->
             if (task.isSuccessful){
                 val idToken = task.result.token
@@ -101,6 +101,7 @@ class HomeFragment : Fragment() {
                 val call: Call<ApiResponse> = apiService.getBookingsByOwner(idToken!!)
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
+                        progressBar.visibility = View.INVISIBLE
                         throw t!!
                     }
 
@@ -110,26 +111,37 @@ class HomeFragment : Fragment() {
                             if (response.body()!!.getStatusCode() == 200){
                                 if (response.body()!!.getType() == "Booking"){
                                     payload = response.body()!!.getPayload()
-                                    Log.d(TAG, response.toString())
-                                    val gson = Gson()
-                                    var booking: Booking
-                                    venues = ArrayList()
-                                    for (item: PayloadFormat in payload) {
-                                        val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
-                                        Log.d(TAG, "Json$jsonObject")
-                                        booking = gson.fromJson(jsonObject, Booking::class.java)
-                                        bookings.add(booking)
+                                    if (payload.isNotEmpty()) {
+                                        Log.d(TAG, response.toString())
+                                        val gson = Gson()
+                                        var booking: Booking
+                                        bookings = ArrayList()
+                                        displayBookings = ArrayList()
+                                        for (item: PayloadFormat in payload) {
+                                            val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
+                                            Log.d(TAG, "Json$jsonObject")
+                                            booking = gson.fromJson(jsonObject, Booking::class.java)
+                                            bookings.add(booking)
 
-                                        venues.add(booking.getVenue())
+                                            if (booking.getVenue().getName() == venueName)
+                                                displayBookings.add(booking)
 
-                                        if (user == null){
-                                            user = booking.getUser()
+                                            Log.d(TAG, "All bookings of user $bookings")
+                                            progressBar.visibility = View.INVISIBLE
+                                            recyclerView.adapter = BookingInfoAdaptor(displayBookings)
                                         }
-                                        Log.d(TAG, "User $user")
-                                        recyclerView.adapter = BookingInfoAdaptor(bookings)
+                                    }else{
+                                        progressBar.visibility = View.INVISIBLE
+                                        Toast.makeText(context, "No Bookings found of this ground $venueName", Toast.LENGTH_LONG).show()
                                     }
+                                }else{
+                                    progressBar.visibility = View.INVISIBLE
                                 }
+                            }else{
+                                progressBar.visibility = View.INVISIBLE
                             }
+                        }else{
+                            progressBar.visibility = View.INVISIBLE
                         }
                     }
                 })

@@ -61,11 +61,23 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0"/>
 
-
-    </android.support.v7.widget.RecyclerView>
-
+    <ProgressBar
+        android:id="@+id/dailyBookingProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:elevation="15dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dailyBooking" />
 
     <Button
         android:id="@+id/addBooking"
@@ -76,7 +88,6 @@
         android:layout_marginTop="8dp"
         android:background="@null"
         android:drawableStart="@drawable/plus"
-        android:onClick="ShowAddBookingPopup"
         app:layout_constraintBottom_toBottomOf="@+id/dailyBooking"
         app:layout_constraintEnd_toEndOf="@+id/dailyBooking"
         app:layout_constraintHorizontal_bias="1.0"

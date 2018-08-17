@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mAuth: FirebaseAuth
 
-    private val TAG = "Host Main activity"
+    private val TAG = "HostMainActivity"
 
     private val mOnNavigationItemSelectedListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -52,8 +52,10 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         val currentUser = mAuth.currentUser
         if (currentUser == null){
+            Log.d(TAG, "Idhr hsi")
             this.startActivity(Intent(this, LoginActivity::class.java))
         }else{
+            Log.d(TAG, "Here")
             currentUser.getIdToken(true).addOnCompleteListener{task ->
                 if (task.isSuccessful){
                     val idToken = task.result.token

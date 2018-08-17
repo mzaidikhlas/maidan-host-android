@@ -41,6 +41,7 @@ class DailyBookingFragment : Fragment() {
     private lateinit var newBookingFromTxt: TextView
     private lateinit var newBookingToTxt: TextView
     private lateinit var bookNow: Button
+    private lateinit var progressBar: ProgressBar
 
     private var dt: String? = null
     private val TAG = "BookingDailyFragment"
@@ -77,6 +78,7 @@ class DailyBookingFragment : Fragment() {
         dateTxt = view.findViewById(R.id.bookingDate)
         bookingsRecycler = view.findViewById(R.id.dailyBooking)
         popupBooking = view.findViewById(R.id.addBooking)
+        progressBar = view.findViewById(R.id.dailyBookingProgressBar)
 
         popupAddBooking = Dialog(context)
         popupAddBooking.setCanceledOnTouchOutside(true)
@@ -97,6 +99,7 @@ class DailyBookingFragment : Fragment() {
 
     //GetBooking with date
     private fun getBookingsWithDate() {
+       progressBar.visibility = View.VISIBLE
 
        currentUser.getIdToken(true).addOnCompleteListener{task ->
            if (task.isSuccessful){
@@ -105,6 +108,7 @@ class DailyBookingFragment : Fragment() {
                val call: Call<ApiResponse> = apiService.getBookingsWithDate(idToken!!, currentUser.email!!, dateTxt.text.toString())
                call.enqueue(object: Callback<ApiResponse>{
                    override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
+                       progressBar.visibility = View.INVISIBLE
                        throw t!!
                    }
 
@@ -114,18 +118,29 @@ class DailyBookingFragment : Fragment() {
                             if (response.body()!!.getStatusCode() == 200){
                                 if (response.body()!!.getType() == "Booking"){
                                     payload = response.body()!!.getPayload()
-                                    Log.d(TAG, response.toString())
-                                    val gson = Gson()
-                                    var booking: Booking? = null
-                                    for (item: PayloadFormat in payload){
-                                        val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
-                                        Log.d(TAG, "Json$jsonObject")
-                                        booking = gson.fromJson(jsonObject, Booking::class.java)
-                                        bookings.add(booking)
-                                        bookingsRecycler.adapter = DateBookingAdapter(bookings)
+                                    if (payload.isNotEmpty()) {
+                                        Log.d(TAG, response.toString())
+                                        val gson = Gson()
+                                        var booking: Booking? = null
+                                        for (item: PayloadFormat in payload) {
+                                            val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
+                                            Log.d(TAG, "Json$jsonObject")
+                                            booking = gson.fromJson(jsonObject, Booking::class.java)
+                                            bookings.add(booking)
+                                            bookingsRecycler.adapter = DateBookingAdapter(bookings)
+                                        }
+                                    }else{
+                                        progressBar.visibility = View.INVISIBLE
+                                        Toast.makeText(context,"No Bookings found", Toast.LENGTH_LONG).show()
                                     }
+                                }else{
+                                    progressBar.visibility = View.INVISIBLE
                                 }
+                            }else{
+                                progressBar.visibility = View.INVISIBLE
                             }
+                       }else{
+                           progressBar.visibility = View.INVISIBLE
                        }
                    }
                })

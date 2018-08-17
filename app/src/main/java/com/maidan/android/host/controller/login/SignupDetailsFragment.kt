@@ -83,8 +83,8 @@ class SignupDetailsFragment : Fragment() {
         }
         submitBtn.setOnClickListener {
             Log.d(TAG, "AYA hai")
-
             progressBar.visibility = View.VISIBLE
+            submitBtn.isEnabled = false
 
             if (phoneNumberTxt.text.isNotEmpty() && cnicTxt.text.isNotEmpty() && dobTxt.text.isNotEmpty()){
                 user = User(email, name, password, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), displayAvatar,
@@ -100,19 +100,23 @@ class SignupDetailsFragment : Fragment() {
                     call.enqueue(object: Callback<ApiResponse>{
                         override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                             Log.d(TAG, t.toString())
+                            progressBar.visibility = View.INVISIBLE
+                            submitBtn.isEnabled = true
                             throw t!!
                         }
 
                         override fun onResponse(call: Call<ApiResponse>?, response: Response<ApiResponse>?) {
                             Log.d(TAG, "OnResponse")
+                            progressBar.visibility = View.INVISIBLE
                             updateUI(currentUser)
                         }
                     })
                 }
             }else{
+                progressBar.visibility = View.INVISIBLE
+                submitBtn.isEnabled = true
                 Toast.makeText(context, "All Fields are required", Toast.LENGTH_LONG).show()
             }
-            progressBar.visibility = View.INVISIBLE
         }
         return view
     }
