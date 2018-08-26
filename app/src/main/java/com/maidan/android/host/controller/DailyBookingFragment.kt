@@ -29,7 +29,7 @@ import com.maidan.android.host.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
+import java.util.Calendar
 import kotlin.collections.ArrayList
 
 class DailyBookingFragment : Fragment() {
@@ -64,21 +64,21 @@ class DailyBookingFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_daily_booking, container, false)
 
-
-        mAuth = FirebaseAuth.getInstance()
-        currentUser = mAuth.currentUser!!
-
-        if (!arguments!!.isEmpty){
-            dt = arguments!!.getString("date")
-//            user = arguments!!.getSerializable("user") as User
-  //          venues = arguments!!.getSerializable("venues") as ArrayList<Venue>
-        }
-
         //Layouts init
         dateTxt = view.findViewById(R.id.bookingDate)
         bookingsRecycler = view.findViewById(R.id.dailyBooking)
         popupBooking = view.findViewById(R.id.addBooking)
         progressBar = view.findViewById(R.id.dailyBookingProgressBar)
+
+        progressBar.visibility = View.VISIBLE
+
+        mAuth = FirebaseAuth.getInstance()
+        currentUser = mAuth.currentUser!!
+
+        if (arguments != null){
+            dt = arguments!!.getString("date")
+            bookings = arguments!!.getSerializable("bookings") as ArrayList<Booking>
+        }
 
         popupAddBooking = Dialog(context)
         popupAddBooking.setCanceledOnTouchOutside(true)
@@ -89,23 +89,26 @@ class DailyBookingFragment : Fragment() {
 
         dateTxt.text = dt
 
-        //Getting bookings
-        bookings = ArrayList()
-        getBookingsWithDate()
-
         bookingsRecycler.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+        if (bookings.isNotEmpty()){
+            progressBar.visibility = View.INVISIBLE
+            bookingsRecycler.adapter = DateBookingAdapter(bookings)
+        }else {
+            progressBar.visibility = View.INVISIBLE
+            Toast.makeText(context, "No bookings found of this date", Toast.LENGTH_SHORT).show()
+        }
         return view
     }
 
     //GetBooking with date
-    private fun getBookingsWithDate() {
+    private fun createBooking(booking: Booking) {
        progressBar.visibility = View.VISIBLE
 
        currentUser.getIdToken(true).addOnCompleteListener{task ->
            if (task.isSuccessful){
                val idToken = task.result.token
                val apiService: ApiInterface = RetrofitClient.instance.create(ApiInterface::class.java)
-               val call: Call<ApiResponse> = apiService.getBookingsWithDate(idToken!!, currentUser.email!!, dateTxt.text.toString())
+               val call: Call<ApiResponse> = apiService.createBooking(idToken!!, booking)
                call.enqueue(object: Callback<ApiResponse>{
                    override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                        progressBar.visibility = View.INVISIBLE
@@ -115,24 +118,14 @@ class DailyBookingFragment : Fragment() {
                    override fun onResponse(call: Call<ApiResponse>?, response: Response<ApiResponse>?) {
                        if (response!!.isSuccessful){
                             Log.d(TAG,"In response")
-                            if (response.body()!!.getStatusCode() == 200){
+                            if (response.body()!!.getStatusCode() == 201){
                                 if (response.body()!!.getType() == "Booking"){
-                                    payload = response.body()!!.getPayload()
-                                    if (payload.isNotEmpty()) {
-                                        Log.d(TAG, response.toString())
-                                        val gson = Gson()
-                                        var booking: Booking? = null
-                                        for (item: PayloadFormat in payload) {
-                                            val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
-                                            Log.d(TAG, "Json$jsonObject")
-                                            booking = gson.fromJson(jsonObject, Booking::class.java)
-                                            bookings.add(booking)
-                                            bookingsRecycler.adapter = DateBookingAdapter(bookings)
-                                        }
-                                    }else{
-                                        progressBar.visibility = View.INVISIBLE
-                                        Toast.makeText(context,"No Bookings found", Toast.LENGTH_LONG).show()
-                                    }
+                                    progressBar.visibility = View.INVISIBLE
+                                    bookings.add(booking)
+                                    popupAddBooking.hide()
+                                    bookingsRecycler.adapter.notifyDataSetChanged()
+                                    Toast.makeText(context,"New Booking created", Toast.LENGTH_LONG).show()
+
                                 }else{
                                     progressBar.visibility = View.INVISIBLE
                                 }
@@ -161,6 +154,11 @@ class DailyBookingFragment : Fragment() {
                 Log.d(TAG, "Do able")
                // val b = Booking(venues[0], null, user!!, newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!)
                // Log.d(TAG, b.toString())
+                bookNow.isEnabled = false
+                val loggedInUser = activity!!.intent.extras.getSerializable("loggedInUser") as User
+                val newBooking = Booking(bookings[0].getVenue(),null,loggedInUser,
+                        newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!)
+                createBooking(newBooking)
             }
             else
                 Toast.makeText(context, "All fields are required", Toast.LENGTH_LONG).show()

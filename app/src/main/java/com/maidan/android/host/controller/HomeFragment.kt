@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeCalender: CalendarView
     private lateinit var progressBar: ProgressBar
     private lateinit var dateString: String
-    private var venueName = "Model Town"
+    private var venueName = "Venue 1"
     private lateinit var displayBookings: ArrayList<Booking>
 
     //Firebase
@@ -56,7 +56,8 @@ class HomeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.activity_booking_initial, container, false)
-
+        val u = activity!!.intent.extras.getSerializable("loggedInUser") as User
+        Log.d(TAG, "User: Activity $u")
         progressBar = view.findViewById(R.id.bookingProgressBar)
 
         mAuth = FirebaseAuth.getInstance()
@@ -69,17 +70,21 @@ class HomeFragment : Fragment() {
         homeCalender = view.findViewById(R.id.homeCalendarView)
         dateString = "$day/$month/$year"
         homeCalender.setOnDateChangeListener { calenderView, y, m, d ->
-            dateString = "$d/$m/$y"
-            Log.d(TAG, dateString)
             progressBar.visibility = View.VISIBLE
+            dateString = "$d/$m/$y"
+            val selectedVenuesBookings = ArrayList<Booking>()
+            Log.d(TAG, dateString)
+            for (booking: Booking in displayBookings){
+                if (booking.getBookingDate() == dateString)
+                    selectedVenuesBookings.add(booking)
+            }
             val dailyBookingFragment = DailyBookingFragment()
             val bundle = Bundle()
             bundle.putString("date", dateString)
-//            bundle.putSerializable("venues", venues)
-//            bundle.putSerializable("user", user)
+            bundle.putSerializable("bookings", selectedVenuesBookings)
             dailyBookingFragment.arguments = bundle
             progressBar.visibility = View.INVISIBLE
-            fragmentManager!!.beginTransaction().replace(R.id.fragment_layout, dailyBookingFragment).commit()
+            fragmentManager!!.beginTransaction().replace(R.id.fragment_layout, dailyBookingFragment).addToBackStack("homeFragment").commit()
         }
         homeCalender.minDate = c.timeInMillis
         Log.d(TAG, dateString)
@@ -98,7 +103,7 @@ class HomeFragment : Fragment() {
             if (task.isSuccessful){
                 val idToken = task.result.token
                 val apiService: ApiInterface = RetrofitClient.instance.create(ApiInterface::class.java)
-                val call: Call<ApiResponse> = apiService.getBookingsByOwner(idToken!!)
+                val call: Call<ApiResponse> = apiService.getBookingsByOwnerPhone(currentUser.phoneNumber!!, idToken!!)
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                         progressBar.visibility = View.INVISIBLE
@@ -126,7 +131,6 @@ class HomeFragment : Fragment() {
                                             if (booking.getVenue().getName() == venueName)
                                                 displayBookings.add(booking)
 
-                                            Log.d(TAG, "All bookings of user $bookings")
                                             progressBar.visibility = View.INVISIBLE
                                             recyclerView.adapter = BookingInfoAdaptor(displayBookings)
                                         }
@@ -135,12 +139,15 @@ class HomeFragment : Fragment() {
                                         Toast.makeText(context, "No Bookings found of this ground $venueName", Toast.LENGTH_LONG).show()
                                     }
                                 }else{
+                                    Toast.makeText(context, "Booking Typed", Toast.LENGTH_LONG).show()
                                     progressBar.visibility = View.INVISIBLE
                                 }
                             }else{
+                                Toast.makeText(context, "Booking code", Toast.LENGTH_LONG).show()
                                 progressBar.visibility = View.INVISIBLE
                             }
                         }else{
+                            Toast.makeText(context, "No Response", Toast.LENGTH_LONG).show()
                             progressBar.visibility = View.INVISIBLE
                         }
                     }

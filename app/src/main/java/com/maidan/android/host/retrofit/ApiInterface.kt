@@ -10,6 +10,9 @@ interface ApiInterface {
     @GET("user/getByEmail")
     fun getUserInfoByEmail(@Header("Authorization") idToken: String): Call<ApiResponse>
 
+    @GET("user/getByPhone")
+    fun getUserInfoByPhone(@Query("phone") phone: String, @Header("Authorization") idToken: String ): Call<ApiResponse>
+
     @GET("user")
     fun getAllUsers(): Call<ApiResponse>
 
@@ -36,6 +39,9 @@ interface ApiInterface {
     @GET("booking/getBookingsByOwner")
     fun getBookingsByOwner(@Header("Authorization") idToken: String): Call<ApiResponse>
 
+    @GET("booking/getBookingsByOwnerPhone")
+    fun getBookingsByOwnerPhone(@Query("phone") phone: String, @Header("Authorization") idToken: String): Call<ApiResponse>
+
 
     //Venue Routes
     @GET("venue/selectedVenues")
@@ -44,6 +50,9 @@ interface ApiInterface {
             @Query("country") countr: String,
             @Query("city") city: String,
             @Header("Authorization") idToken: String): Call<ApiResponse>
+
+    @GET("venue")
+    fun getAllVenues(@Header("Authorization") idToken: String): Call<ApiResponse>
 
     //Transaction Routes
 

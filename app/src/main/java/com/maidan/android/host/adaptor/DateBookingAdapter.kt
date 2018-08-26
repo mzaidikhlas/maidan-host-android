@@ -24,6 +24,7 @@ class DateBookingAdapter(private val bookings: ArrayList<Booking>) : RecyclerVie
         val booking: Booking = bookings[position]
         holder.venueSpecificTxt.text = booking.getVenue().getName()
         holder.fromTimeTxt.text = booking.getStartTime()
+        holder.toTimeTxt.text = booking.getDurationOfBooking()
         holder.bookingUsernameTxt.text = booking.getUser().getName()
 
     }
