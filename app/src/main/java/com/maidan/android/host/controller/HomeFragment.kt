@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -39,14 +40,11 @@ class HomeFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var dateString: String
     private lateinit var venuesSpinner: Spinner
-    private var venueName = "Venue 1"
     private lateinit var displayBookings: ArrayList<Booking>
 
     //Firebase
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUser: FirebaseUser
-    private var user: User? = null
-    private lateinit var venues: ArrayList<Venue>
 
     //Api Call Response
     private lateinit var payload: ArrayList<PayloadFormat>
@@ -77,14 +75,13 @@ class HomeFragment : Fragment() {
         venuesSpinner.adapter = adapter
         venuesSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                getBookingsWithOwner(venuesSpinner.selectedItem as String)
+                getBookingsWithOwner(venuesSpinner.selectedItem!! as String)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>) {
                 venuesSpinner.requestFocus()
             }
         }
-
         val c: Calendar = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)
         val month = c.get(Calendar.MONTH)
@@ -100,15 +97,14 @@ class HomeFragment : Fragment() {
             bundle.putString("date", dateString)
             if (bookings != null)
                 bundle.putSerializable("bookings", bookings)
+            else Log.d(TAG, "Bookings empty in home")
 
             dailyBookingFragment.arguments = bundle
             progressBar.visibility = View.INVISIBLE
-            fragmentManager!!.beginTransaction().replace(R.id.fragment_layout, dailyBookingFragment).addToBackStack("homeFragment").commit()
+            fragmentManager!!.beginTransaction().addToBackStack("homeFragment").replace(R.id.fragment_layout, dailyBookingFragment).commit()
         }
         homeCalender.minDate = c.timeInMillis
         Log.d(TAG, dateString)
-
-        getBookingsWithOwner(venuesSpinner.selectedItem as String)
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -118,6 +114,9 @@ class HomeFragment : Fragment() {
 
     private fun getBookingsWithOwner(venueName: String) {
         progressBar.visibility = View.VISIBLE
+        activity!!.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
         currentUser.getIdToken(true).addOnCompleteListener{task ->
             if (task.isSuccessful){
                 val idToken = task.result.token
@@ -126,6 +125,7 @@ class HomeFragment : Fragment() {
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                         progressBar.visibility = View.INVISIBLE
+                        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         throw t!!
                     }
 
@@ -150,24 +150,30 @@ class HomeFragment : Fragment() {
                                             if (booking.getVenue().getName() == venueName)
                                                 displayBookings.add(booking)
                                         }
+                                        Log.d(TAG, "Bookings call $bookings")
                                         progressBar.visibility = View.INVISIBLE
+                                        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                                         recyclerView.adapter = BookingInfoAdaptor(displayBookings)
                                         recyclerView.adapter.notifyDataSetChanged()
                                     }else{
                                         progressBar.visibility = View.INVISIBLE
+                                        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                                         Toast.makeText(context, "No Bookings found of this ground $venueName", Toast.LENGTH_LONG).show()
                                     }
                                 }else{
                                     Toast.makeText(context, "Booking Typed", Toast.LENGTH_LONG).show()
                                     progressBar.visibility = View.INVISIBLE
+                                    activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                                 }
                             }else{
                                 Toast.makeText(context, "Booking code", Toast.LENGTH_LONG).show()
                                 progressBar.visibility = View.INVISIBLE
+                                activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                             }
                         }else{
                             Toast.makeText(context, "No Response", Toast.LENGTH_LONG).show()
                             progressBar.visibility = View.INVISIBLE
+                            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         }
                     }
                 })

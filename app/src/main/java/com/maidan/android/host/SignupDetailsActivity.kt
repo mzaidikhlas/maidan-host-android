@@ -182,6 +182,7 @@ class SignupDetailsActivity : AppCompatActivity() {
     private fun uploadImage(){
         val progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Uploading...")
+        progressDialog.setCancelable(false)
         progressDialog.show()
 
         val riversRef = mStorageRef.child("avatar/${currentUser.uid}")

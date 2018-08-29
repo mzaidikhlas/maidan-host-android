@@ -2,6 +2,7 @@ package com.maidan.android.host.controller
 
 
 import android.app.Dialog
+import android.app.FragmentManager
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -20,6 +21,7 @@ import com.google.gson.Gson
 import com.maidan.android.host.R
 import com.maidan.android.host.adaptor.DateBookingAdapter
 import com.maidan.android.host.models.Booking
+import com.maidan.android.host.models.Transaction
 import com.maidan.android.host.models.User
 import com.maidan.android.host.models.Venue
 import com.maidan.android.host.retrofit.ApiInterface
@@ -30,7 +32,8 @@ import kotlinx.android.synthetic.main.popup_add_booking.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
 
 class DailyBookingFragment : Fragment() {
@@ -44,6 +47,7 @@ class DailyBookingFragment : Fragment() {
     private lateinit var bookNow: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var venuesSpinner: Spinner
+    private lateinit var backBtn: Button
 
     private var dt: String? = null
     private val TAG = "BookingDailyFragment"
@@ -76,22 +80,44 @@ class DailyBookingFragment : Fragment() {
         popupBooking = view.findViewById(R.id.addBooking)
         progressBar = view.findViewById(R.id.dailyBookingProgressBar)
         venuesSpinner = view.findViewById(R.id.dailyBookingVenuesSpinner)
+        backBtn = view.findViewById(R.id.dailyBookingBack)
 
+        //Showing progressbar
         progressBar.visibility = View.VISIBLE
 
-        //venues spinner init
+        //populating layout
+        dateTxt.text = dt
+
+        //Getting bundle data
+        if (arguments != null){
+            dt = arguments!!.getString("date")
+            bookings = arguments!!.get("bookings") as ArrayList<Booking>?
+        }else Log.d(TAG, "Arguments empty")
         loggedInUser = activity!!.intent.extras.getSerializable("loggedInUser") as User
+
+        //Preventing user to add booking with no venue
+        if (loggedInUser.getVenues()!!.isEmpty())
+            popupBooking.isEnabled = false
+
+        //Setting up recycler view for bookings
+        bookingsRecycler.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+
+        //Back button listener
+        backBtn.setOnClickListener {
+            fragmentManager!!.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+
+        //venues spinner init
         val spinnerArray = ArrayList<String>()
         for (item: Venue in loggedInUser.getVenues()!!)
             spinnerArray.add(item.getName())
 
-        val adapter = ArrayAdapter<String>(
-                context, android.R.layout.simple_spinner_item, spinnerArray)
+        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         venuesSpinner.adapter = adapter
-
         venuesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                //Getting bookings from db
                 setBookings(venuesSpinner.selectedItem as String)
             }
 
@@ -99,12 +125,8 @@ class DailyBookingFragment : Fragment() {
                 venuesSpinner.requestFocus()
             }
         }
-        if (arguments != null){
-            dt = arguments!!.getString("date")
-            if (bookings != null)
-                bookings = arguments!!.getSerializable("bookings") as ArrayList<Booking>
-        }
 
+        //New booking popup init
         popupAddBooking = Dialog(context)
         popupAddBooking.setCanceledOnTouchOutside(true)
         popupBooking.setOnClickListener {
@@ -112,22 +134,10 @@ class DailyBookingFragment : Fragment() {
             showAddBookingPopup()
         }
 
-        dateTxt.text = dt
-
-        bookingsRecycler.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
-        setBookings(venuesSpinner.selectedItem as String)
-
-//        if (bookings != null){
-//            progressBar.visibility = View.INVISIBLE
-//            setBookings(venuesSpinner.selectedItem as String)
-//        }else {
-//            progressBar.visibility = View.INVISIBLE
-//            Toast.makeText(context, "No bookings found", Toast.LENGTH_SHORT).show()
-//        }
         return view
     }
 
-    //GetBooking with date
+    //Creating new booking
     private fun createBooking(booking: Booking) {
        progressBar.visibility = View.VISIBLE
 
@@ -152,6 +162,7 @@ class DailyBookingFragment : Fragment() {
                                         bookings = ArrayList()
 
                                     bookings!!.add(booking)
+                                    setBookings(venuesSpinner.selectedItem as String)
                                     popupAddBooking.hide()
                                     Toast.makeText(context,"New Booking created", Toast.LENGTH_LONG).show()
 
@@ -169,8 +180,15 @@ class DailyBookingFragment : Fragment() {
            }
        }
     }
+
+    //New Booking popup
     fun showAddBookingPopup()
     {
+        //Time validation
+        var toTimeSeconds: Int? = null
+        var fromTimeSeconds: Int? = null
+
+        //Popup layouts init
         popupAddBooking.setContentView(R.layout.popup_add_booking)
         newBookingNameTxt = popupAddBooking.findViewById(R.id.name)
         newBookingFromTxt = popupAddBooking.findViewById(R.id.from)
@@ -182,22 +200,48 @@ class DailyBookingFragment : Fragment() {
         bookNow.setOnClickListener {
             Log.d(TAG, "Book")
             if (newBookingFromTxt.text.isNotEmpty() && newBookingToTxt.text.isNotEmpty() && newBookingNameTxt.text.isNotEmpty()) {
-                bookNow.isEnabled = false
-
-                val loggedInUser = activity!!.intent.extras.getSerializable("loggedInUser") as User
-                var venue: Venue? = null
-                for (venueItem: Venue in loggedInUser.getVenues()!!){
-                    if (venueItem.getName() == venuesSpinner.selectedItem) {
-                        venue = venueItem
-                        break
+                if (toTimeSeconds!! > fromTimeSeconds!!){
+                    bookNow.isEnabled = false
+                    var venue: Venue? = null
+                    for (venueItem: Venue in loggedInUser.getVenues()!!){
+                        if (venueItem.getName() == venuesSpinner.selectedItem) {
+                            venue = venueItem
+                            break
+                        }
                     }
+                    //Calculating bills
+                    val playHrs: Float =  ((toTimeSeconds!! - fromTimeSeconds!!)/3600).toFloat()
+                    val pricePerHr: Float = playHrs*venue!!.getRate().getPerHrRate()
+                    val convenienceFee: Float = pricePerHr/venue.getRate().getVendorServiceFee()
+                    val taxes = 0F
+                    val total = pricePerHr + convenienceFee + taxes
+
+                    //Initializing transaction object
+                    val transaction = Transaction(convenienceFee, playHrs, pricePerHr, total, taxes, "manualCashReceiving")
+                    Log.d(TAG, "Transaction $transaction")
+
+                    //Initializing booking object
+                    val newBooking = Booking(venue,transaction,loggedInUser,
+                            newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, "booked")
+
+                    //Creating new booking in db
+                    createBooking(newBooking)
+                }else{
+                    newBookingToTxt.error = "Please enter correct time"
                 }
-                val newBooking = Booking(venue!!,null,loggedInUser,
-                        newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!)
-                createBooking(newBooking)
             }
-            else
+            else{
+//                if (newBookingToTxt.text.isNullOrEmpty()){
+//                    newBookingToTxt.error = "Time required"
+//                }
+//                if (newBookingFromTxt.text.isNullOrEmpty()){
+//                    newBookingFromTxt.error = "Time required"
+//                }
+//                if (newBookingNameTxt.text.isNullOrEmpty()){
+//                    newBookingNameTxt.error = "Name required"
+//                }
                 Toast.makeText(context, "All fields are required", Toast.LENGTH_LONG).show()
+            }
         }
 
         newBookingFromTxt.setOnClickListener {
@@ -208,10 +252,15 @@ class DailyBookingFragment : Fragment() {
             // Launch Time Picker Dialog
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
+                        //Converting time in seconds for validation check
+                        fromTimeSeconds = ((hr*3600)+(min*60))
+                        Log.d(TAG, "To time $fromTimeSeconds")
+
                         Log.d(TAG, "Hour: $hr, Min: $min")
                         val timeString = "$hr:$min"
                         newBookingFromTxt.text = timeString
                     }, hourOfDay, minute, false)
+
             timePickerDialog.show()
 
         }
@@ -223,11 +272,14 @@ class DailyBookingFragment : Fragment() {
             // Launch Time Picker Dialog
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
+                        //Converting time in seconds for validation check
+                        toTimeSeconds = ((hr*3600)+(min*60))
+                        Log.d(TAG, "From time $toTimeSeconds")
+
                         Log.d(TAG, "Hour: $hr, Min: $min")
                         val timeString = "$hr:$min"
                         newBookingToTxt.text = timeString
                     }, hourOfDay, minute, false)
-
             timePickerDialog.show()
         }
         popupAddBooking.show()
@@ -245,8 +297,14 @@ class DailyBookingFragment : Fragment() {
                 bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
                 bookingsRecycler.adapter.notifyDataSetChanged()
             }else{
-                Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.INVISIBLE
+                bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
+                bookingsRecycler.adapter.notifyDataSetChanged()
+                Toast.makeText(context, "No booking found of this venue", Toast.LENGTH_SHORT).show()
             }
+        }else{
+            progressBar.visibility = View.INVISIBLE
+            Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
         }
     }
 }

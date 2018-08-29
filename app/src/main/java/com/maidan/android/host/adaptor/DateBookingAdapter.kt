@@ -13,7 +13,7 @@ class DateBookingAdapter(private val bookings: ArrayList<Booking>) : RecyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.daily_booking_info, parent, false)
-        return ViewHolder(view);
+        return ViewHolder(view)
     }
 
     override fun getItemCount(): Int {
@@ -26,7 +26,7 @@ class DateBookingAdapter(private val bookings: ArrayList<Booking>) : RecyclerVie
         holder.fromTimeTxt.text = booking.getStartTime()
         holder.toTimeTxt.text = booking.getDurationOfBooking()
         holder.bookingUsernameTxt.text = booking.getUser().getName()
-
+        holder.bookingStatusTxt.text = booking.getStatus()
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
