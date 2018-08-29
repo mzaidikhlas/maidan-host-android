@@ -4,6 +4,7 @@ package com.maidan.android.host
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -88,6 +89,7 @@ class LoginPhoneVerificationFragment : Fragment() {
 
         override fun onVerificationFailed(p0: FirebaseException?) {
             Log.d("LoginActivity", p0.toString())
+            fragmentManager!!.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             Toast.makeText(context, "Error ${p0!!.message}", Toast.LENGTH_SHORT).show()
         }
 
@@ -102,7 +104,7 @@ class LoginPhoneVerificationFragment : Fragment() {
                 startActivity(intent)
             }else {
                 // Sign in failed, display a message and update the UI
-                Log.w("LoginActivity", "signInWithCredential:failure", task.exception);
+                Log.w("LoginActivity", "signInWithCredential:failure", task.exception)
                 if (task.exception is FirebaseAuthInvalidCredentialsException) {
                     // The verification code entered was invalid
                     Toast.makeText(context, "The verification code entered was invalid", Toast.LENGTH_SHORT).show()

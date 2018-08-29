@@ -20,7 +20,7 @@ class LoginPhoneFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login_phone, container, false)
 
         phoneEdtTxt = view.findViewById(R.id.loginPhoneNo)
-        submitBtn = view.findViewById(R.id.loginSubmitBtn)
+        submitBtn = view.findViewById(R.id.login_btn)
 
         submitBtn.setOnClickListener{
             val number = phoneEdtTxt.text.toString()
@@ -33,7 +33,7 @@ class LoginPhoneFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("phonenumber", numStr)
                 verifyNumber.arguments = bundle
-                fragmentManager!!.beginTransaction().replace(R.id.login_fragment_layout, verifyNumber).commit()
+                fragmentManager!!.beginTransaction().addToBackStack("loginPhoneFragment").replace(R.id.login_fragment_layout, verifyNumber).commit()
                 Toast.makeText(context, "Number is $numStr", Toast.LENGTH_SHORT).show()
             }
         }

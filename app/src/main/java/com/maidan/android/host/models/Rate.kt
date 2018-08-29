@@ -1,7 +1,9 @@
 package com.maidan.android.host.models
 
+import java.io.Serializable
+
 data class Rate(private var perHrRate: Int, private var nightRate: Int, private var peakRate: Int,
-                private var clientServiceFee: Int, private var vendorServiceFee: Int){
+                private var clientServiceFee: Int, private var vendorServiceFee: Int): Serializable{
 
     fun getPerHrRate(): Int{return this.perHrRate}
 

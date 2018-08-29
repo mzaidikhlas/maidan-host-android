@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.maidan.android.host.models.User
 import com.maidan.android.host.retrofit.ApiInterface
@@ -52,8 +53,10 @@ class LoadingActivity : AppCompatActivity() {
                                             val gson = Gson()
                                             val jsonObject = gson.toJsonTree(payload[0].getData()).asJsonObject
                                             loggedInUser = gson.fromJson(jsonObject, User::class.java)
+                                            Log.d(TAG, loggedInUser.toString())
                                             val mainActivity = Intent(applicationContext, MainActivity::class.java)
                                             mainActivity.putExtra("firebaseUser", user)
+                                            Log.d(TAG, "User: $user")
                                             mainActivity.putExtra("loggedInUser", loggedInUser)
                                             mainActivity.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                             progressBar.visibility = View.INVISIBLE

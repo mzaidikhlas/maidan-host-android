@@ -1,7 +1,10 @@
 package com.maidan.android.host
 
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -15,13 +18,16 @@ import com.maidan.android.host.models.User
 import com.maidan.android.host.retrofit.ApiInterface
 import com.maidan.android.host.retrofit.ApiResponse
 import com.maidan.android.host.retrofit.RetrofitClient
-import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.auth.FirebaseUser
+import com.maidan.android.host.models.Location
+import com.maidan.android.host.models.Rate
+import com.maidan.android.host.models.Venue
+import java.util.*
 
 
 class SignupDetailsActivity : AppCompatActivity() {
@@ -45,10 +51,12 @@ class SignupDetailsActivity : AppCompatActivity() {
     private lateinit var emailTxt: TextView
     private lateinit var phoneNumberTxt: EditText
     private lateinit var cnicTxt: EditText
-    private lateinit var dobTxt: EditText
+    private lateinit var dobTxt: TextView
     private lateinit var genderSpinner: Spinner
     private lateinit var submitBtn: Button
+    private var dateString: String? = null
     private lateinit var progressBar: ProgressBar
+    private lateinit var dobPicker: DatePickerDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +77,27 @@ class SignupDetailsActivity : AppCompatActivity() {
         submitBtn = findViewById(R.id.signup_submit_btn)
         progressBar = findViewById(R.id.signupProgressBar)
 
+
+        // Date of Birth DatePicker
+        dobTxt.setOnClickListener {
+            val c = Calendar.getInstance()
+            val year = c.get(Calendar.YEAR)
+            val month = c.get(Calendar.MONTH)
+            val day = c.get(Calendar.DAY_OF_MONTH)
+
+            dateString = "$day/$month/$year"
+
+            dobPicker = DatePickerDialog(this,R.style.SpinnerDatePicker,
+                    DatePickerDialog.OnDateSetListener { view, yr, monthOfYear, dayOfMonth ->
+                        Log.d(TAG, "Year: $yr, Month $monthOfYear, Day: $dayOfMonth")
+
+                        dateString = "$dayOfMonth/$monthOfYear/$yr"
+                        dateString = "$dayOfMonth/$monthOfYear/$yr"
+                        dobTxt.text = dateString
+                    },year,month,day)
+            dobPicker.show()
+            Log.d(TAG,dateString)
+        }
         //populating layout
         if (currentUser.phoneNumber != null) {
             phoneNumberTxt.setText(currentUser.phoneNumber!!, TextView.BufferType.EDITABLE)
@@ -155,9 +184,7 @@ class SignupDetailsActivity : AppCompatActivity() {
         progressDialog.setTitle("Uploading...")
         progressDialog.show()
 
-        val imageName = "${phoneNumberTxt.text}-${nameTxt.text}.jpg"
-
-        val riversRef = mStorageRef.child("avatar/$imageName")
+        val riversRef = mStorageRef.child("avatar/${currentUser.uid}")
 
         riversRef.putFile(imageUri!!)
                 .addOnSuccessListener { taskSnapshot ->
@@ -179,8 +206,31 @@ class SignupDetailsActivity : AppCompatActivity() {
     }
 
     private fun createUser (avatar: String?){
+        val venue = Venue("Venue 1",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+            ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+        val venue2 = Venue("Venue 2",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+                ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+
+        val venue3 = Venue("Venue 3",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+                ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+        val venues = ArrayList<Venue>()
+        venues.add(venue)
+        venues.add(venue2)
+        venues.add(venue3)
         user = User(emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
-                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null)
+                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, venues)
+
+        Log.d(TAG, "User Venues: $venues")
+        Log.d(TAG, "User: $user")
 
         currentUser.getIdToken(true).addOnCompleteListener { task ->
             val idToken = task.result.token

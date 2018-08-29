@@ -8,10 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CalendarView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
@@ -29,7 +26,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
-
+import android.widget.ArrayAdapter
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 
 class HomeFragment : Fragment() {
 
@@ -39,6 +38,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeCalender: CalendarView
     private lateinit var progressBar: ProgressBar
     private lateinit var dateString: String
+    private lateinit var venuesSpinner: Spinner
     private var venueName = "Venue 1"
     private lateinit var displayBookings: ArrayList<Booking>
 
@@ -50,18 +50,41 @@ class HomeFragment : Fragment() {
 
     //Api Call Response
     private lateinit var payload: ArrayList<PayloadFormat>
-    private lateinit var bookings: ArrayList<Booking>
+    private var bookings: ArrayList<Booking>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.activity_booking_initial, container, false)
-        val u = activity!!.intent.extras.getSerializable("loggedInUser") as User
-        Log.d(TAG, "User: Activity $u")
-        progressBar = view.findViewById(R.id.bookingProgressBar)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        val loggedInUser = activity!!.intent.extras.getSerializable("loggedInUser") as User
+        Log.d(TAG, "User: Activity $loggedInUser")
 
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
+
+        progressBar = view.findViewById(R.id.bookingProgressBar)
+        venuesSpinner = view.findViewById(R.id.homeVenuesSpinner)
+        venuesSpinner.setPopupBackgroundResource(R.drawable.light_green_to_dark_green_1)
+
+        //Venues spinner init
+        val spinnerArray = ArrayList<String>()
+        for (item: Venue in loggedInUser.getVenues()!!)
+            spinnerArray.add(item.getName())
+
+        val adapter = ArrayAdapter<String>(
+                context, android.R.layout.simple_spinner_item, spinnerArray)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        venuesSpinner.adapter = adapter
+        venuesSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                getBookingsWithOwner(venuesSpinner.selectedItem as String)
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>) {
+                venuesSpinner.requestFocus()
+            }
+        }
+
         val c: Calendar = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)
         val month = c.get(Calendar.MONTH)
@@ -72,16 +95,12 @@ class HomeFragment : Fragment() {
         homeCalender.setOnDateChangeListener { calenderView, y, m, d ->
             progressBar.visibility = View.VISIBLE
             dateString = "$d/$m/$y"
-            val selectedVenuesBookings = ArrayList<Booking>()
-            Log.d(TAG, dateString)
-            for (booking: Booking in displayBookings){
-                if (booking.getBookingDate() == dateString)
-                    selectedVenuesBookings.add(booking)
-            }
             val dailyBookingFragment = DailyBookingFragment()
             val bundle = Bundle()
             bundle.putString("date", dateString)
-            bundle.putSerializable("bookings", selectedVenuesBookings)
+            if (bookings != null)
+                bundle.putSerializable("bookings", bookings)
+
             dailyBookingFragment.arguments = bundle
             progressBar.visibility = View.INVISIBLE
             fragmentManager!!.beginTransaction().replace(R.id.fragment_layout, dailyBookingFragment).addToBackStack("homeFragment").commit()
@@ -89,7 +108,7 @@ class HomeFragment : Fragment() {
         homeCalender.minDate = c.timeInMillis
         Log.d(TAG, dateString)
 
-        getBookingsWithOwner()
+        getBookingsWithOwner(venuesSpinner.selectedItem as String)
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -97,7 +116,7 @@ class HomeFragment : Fragment() {
         return view
     }
 
-    private fun getBookingsWithOwner() {
+    private fun getBookingsWithOwner(venueName: String) {
         progressBar.visibility = View.VISIBLE
         currentUser.getIdToken(true).addOnCompleteListener{task ->
             if (task.isSuccessful){
@@ -126,14 +145,14 @@ class HomeFragment : Fragment() {
                                             val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
                                             Log.d(TAG, "Json$jsonObject")
                                             booking = gson.fromJson(jsonObject, Booking::class.java)
-                                            bookings.add(booking)
+                                            bookings!!.add(booking)
 
                                             if (booking.getVenue().getName() == venueName)
                                                 displayBookings.add(booking)
-
-                                            progressBar.visibility = View.INVISIBLE
-                                            recyclerView.adapter = BookingInfoAdaptor(displayBookings)
                                         }
+                                        progressBar.visibility = View.INVISIBLE
+                                        recyclerView.adapter = BookingInfoAdaptor(displayBookings)
+                                        recyclerView.adapter.notifyDataSetChanged()
                                     }else{
                                         progressBar.visibility = View.INVISIBLE
                                         Toast.makeText(context, "No Bookings found of this ground $venueName", Toast.LENGTH_LONG).show()
