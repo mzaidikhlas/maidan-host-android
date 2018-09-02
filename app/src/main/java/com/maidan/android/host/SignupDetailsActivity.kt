@@ -3,8 +3,6 @@ package com.maidan.android.host
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -24,9 +22,6 @@ import retrofit2.Response
 import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.auth.FirebaseUser
-import com.maidan.android.host.models.Location
-import com.maidan.android.host.models.Rate
-import com.maidan.android.host.models.Venue
 import java.util.*
 
 
@@ -207,30 +202,29 @@ class SignupDetailsActivity : AppCompatActivity() {
     }
 
     private fun createUser (avatar: String?){
-        val venue = Venue("Venue 1",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-            ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-        val venue2 = Venue("Venue 2",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-                ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-
-        val venue3 = Venue("Venue 3",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-                ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-        val venues = ArrayList<Venue>()
-        venues.add(venue)
-        venues.add(venue2)
-        venues.add(venue3)
+//        val venue = Venue("Venue 1",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//            ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//        val venue2 = Venue("Venue 2",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//                ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//
+//        val venue3 = Venue("Venue 3",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//                ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//        val venues = ArrayList<Venue>()
+//        venues.add(venue)
+//        venues.add(venue2)
+//        venues.add(venue3)
         user = User(emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
-                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, venues)
+                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, null)
 
-        Log.d(TAG, "User Venues: $venues")
         Log.d(TAG, "User: $user")
 
         currentUser.getIdToken(true).addOnCompleteListener { task ->
@@ -251,7 +245,7 @@ class SignupDetailsActivity : AppCompatActivity() {
                     if (response!!.isSuccessful){
                         Log.d(TAG, "OnResponse")
                         progressBar.visibility = View.INVISIBLE
-                        val intent = Intent(applicationContext, LoadingActivity::class.java)
+                        val intent = Intent(applicationContext, MainActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }

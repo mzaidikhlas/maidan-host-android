@@ -1,22 +1,24 @@
 package com.maidan.android.host.controller
 
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.app.FragmentManager
 import android.app.TimePickerDialog
+import android.content.Context
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.Editable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.gson.Gson
 
 import com.maidan.android.host.R
 import com.maidan.android.host.adaptor.DateBookingAdapter
@@ -28,11 +30,9 @@ import com.maidan.android.host.retrofit.ApiInterface
 import com.maidan.android.host.retrofit.ApiResponse
 import com.maidan.android.host.retrofit.PayloadFormat
 import com.maidan.android.host.retrofit.RetrofitClient
-import kotlinx.android.synthetic.main.popup_add_booking.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -49,55 +49,67 @@ class DailyBookingFragment : Fragment() {
     private lateinit var venuesSpinner: Spinner
     private lateinit var backBtn: Button
 
+    private var dialog: AlertDialog? = null
+    private lateinit var animation: AnimationDrawable
+
     private var dt: String? = null
     private val TAG = "BookingDailyFragment"
-    private var user: User? = null
-    private lateinit var venues: ArrayList<Venue>
 
     //Firebase
     private lateinit var mAuth: FirebaseAuth
     private lateinit var currentUser: FirebaseUser
 
-    private lateinit var loggedInUser: User
+    private var loggedInUser: User? = null
 
     //Api Call Response
-    private lateinit var payload: ArrayList<PayloadFormat>
     private var bookings: ArrayList<Booking>? = null
 
     private lateinit var popupBooking: Button
     private lateinit var popupAddBooking: Dialog
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        Log.d(TAG, "OnAttach")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG, "OnCreate")
+        if (savedInstanceState != null) {
+            loggedInUser = savedInstanceState.getSerializable("loggedInUser") as User
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "OnCreateView")
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_daily_booking, container, false)
+        if (view != null) Log.d(TAG, "Reusing view")
+
+        val view = if (view != null) view else inflater.inflate(R.layout.fragment_daily_booking, container, false)
+
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
 
         //Layouts init
-        dateTxt = view.findViewById(R.id.bookingDate)
+        dateTxt = view!!.findViewById(R.id.bookingDate)
         bookingsRecycler = view.findViewById(R.id.dailyBooking)
         popupBooking = view.findViewById(R.id.addBooking)
         progressBar = view.findViewById(R.id.dailyBookingProgressBar)
         venuesSpinner = view.findViewById(R.id.dailyBookingVenuesSpinner)
         backBtn = view.findViewById(R.id.dailyBookingBack)
 
-        //Showing progressbar
-        progressBar.visibility = View.VISIBLE
-
         //populating layout
         dateTxt.text = dt
 
         //Getting bundle data
-        if (arguments != null){
-            dt = arguments!!.getString("date")
-            bookings = arguments!!.get("bookings") as ArrayList<Booking>?
-        }else Log.d(TAG, "Arguments empty")
-        loggedInUser = activity!!.intent.extras.getSerializable("loggedInUser") as User
-
-        //Preventing user to add booking with no venue
-        if (loggedInUser.getVenues()!!.isEmpty())
-            popupBooking.isEnabled = false
+        if (loggedInUser == null) {
+            if (arguments != null) {
+                dt = arguments!!.getString("date")
+                bookings = arguments!!.get("bookings") as ArrayList<Booking>?
+                loggedInUser = arguments!!.get("loggedInUser") as User
+            } else Log.d(TAG, "Arguments empty")
+        }else Log.d(TAG, "LoggedInUser $loggedInUser")
 
         //Setting up recycler view for bookings
         bookingsRecycler.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -108,23 +120,27 @@ class DailyBookingFragment : Fragment() {
         }
 
         //venues spinner init
-        val spinnerArray = ArrayList<String>()
-        for (item: Venue in loggedInUser.getVenues()!!)
-            spinnerArray.add(item.getName())
+        if (loggedInUser!!.getVenues() != null) {
+            val spinnerArray = ArrayList<String>()
+            for (item: Venue in loggedInUser!!.getVenues()!!)
+                spinnerArray.add(item.getName())
 
-        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        venuesSpinner.adapter = adapter
-        venuesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                //Getting bookings from db
-                setBookings(venuesSpinner.selectedItem as String)
-            }
+            val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            venuesSpinner.adapter = adapter
+            venuesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View?, position: Int, id: Long) {
+                    val selectedItem = venuesSpinner.getItemAtPosition(position)
+                    //Getting bookings from db
+                    showProgressDialog()
+                    setBookings(selectedItem as String)
+                }
 
-            override fun onNothingSelected(parentView: AdapterView<*>) {
-                venuesSpinner.requestFocus()
+                override fun onNothingSelected(parentView: AdapterView<*>) {
+                    venuesSpinner.requestFocus()
+                }
             }
-        }
+        }else popupBooking.isEnabled = false
 
         //New booking popup init
         popupAddBooking = Dialog(context)
@@ -137,9 +153,55 @@ class DailyBookingFragment : Fragment() {
         return view
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        Log.d(TAG, "OnActivityCreated")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "OnStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "OnResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "OnPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "OnStop")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d(TAG, "OnDestroyView")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d(TAG, "OnSaveInstanceState")
+        outState.putSerializable("loggedInUser", loggedInUser)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "OnDestroy")
+    }
+
+    override fun onDetach() {
+        Log.d(TAG, "OnDetach")
+        super.onDetach()
+    }
+
     //Creating new booking
     private fun createBooking(booking: Booking) {
-       progressBar.visibility = View.VISIBLE
+       showProgressDialog()
 
        currentUser.getIdToken(true).addOnCompleteListener{task ->
            if (task.isSuccessful){
@@ -148,7 +210,7 @@ class DailyBookingFragment : Fragment() {
                val call: Call<ApiResponse> = apiService.createBooking(idToken!!, booking)
                call.enqueue(object: Callback<ApiResponse>{
                    override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
-                       progressBar.visibility = View.INVISIBLE
+                       hideProgressDialog()
                        throw t!!
                    }
 
@@ -157,23 +219,22 @@ class DailyBookingFragment : Fragment() {
                             Log.d(TAG,"In response")
                             if (response.body()!!.getStatusCode() == 201){
                                 if (response.body()!!.getType() == "Booking"){
-                                    progressBar.visibility = View.INVISIBLE
                                     if (bookings == null)
                                         bookings = ArrayList()
-
+                                    showAddBookingPopup()
                                     bookings!!.add(booking)
                                     setBookings(venuesSpinner.selectedItem as String)
                                     popupAddBooking.hide()
                                     Toast.makeText(context,"New Booking created", Toast.LENGTH_LONG).show()
 
                                 }else{
-                                    progressBar.visibility = View.INVISIBLE
+                                    hideProgressDialog()
                                 }
                             }else{
-                                progressBar.visibility = View.INVISIBLE
+                                hideProgressDialog()
                             }
                        }else{
-                           progressBar.visibility = View.INVISIBLE
+                           hideProgressDialog()
                        }
                    }
                })
@@ -182,8 +243,7 @@ class DailyBookingFragment : Fragment() {
     }
 
     //New Booking popup
-    fun showAddBookingPopup()
-    {
+    fun showAddBookingPopup() {
         //Time validation
         var toTimeSeconds: Int? = null
         var fromTimeSeconds: Int? = null
@@ -200,10 +260,12 @@ class DailyBookingFragment : Fragment() {
         bookNow.setOnClickListener {
             Log.d(TAG, "Book")
             if (newBookingFromTxt.text.isNotEmpty() && newBookingToTxt.text.isNotEmpty() && newBookingNameTxt.text.isNotEmpty()) {
+                if (availabiltyCheck(fromTimeSeconds!!,toTimeSeconds!!)){}
+
                 if (toTimeSeconds!! > fromTimeSeconds!!){
                     bookNow.isEnabled = false
                     var venue: Venue? = null
-                    for (venueItem: Venue in loggedInUser.getVenues()!!){
+                    for (venueItem: Venue in loggedInUser!!.getVenues()!!){
                         if (venueItem.getName() == venuesSpinner.selectedItem) {
                             venue = venueItem
                             break
@@ -221,7 +283,7 @@ class DailyBookingFragment : Fragment() {
                     Log.d(TAG, "Transaction $transaction")
 
                     //Initializing booking object
-                    val newBooking = Booking(venue,transaction,loggedInUser,
+                    val newBooking = Booking(venue,transaction,loggedInUser!!,
                             newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, "booked")
 
                     //Creating new booking in db
@@ -259,8 +321,7 @@ class DailyBookingFragment : Fragment() {
                         Log.d(TAG, "Hour: $hr, Min: $min")
                         val timeString = "$hr:$min"
                         newBookingFromTxt.text = timeString
-                    }, hourOfDay, minute, false)
-
+                    }, hourOfDay, minute, true)
             timePickerDialog.show()
 
         }
@@ -279,32 +340,83 @@ class DailyBookingFragment : Fragment() {
                         Log.d(TAG, "Hour: $hr, Min: $min")
                         val timeString = "$hr:$min"
                         newBookingToTxt.text = timeString
-                    }, hourOfDay, minute, false)
+                    }, hourOfDay, minute, true)
             timePickerDialog.show()
         }
         popupAddBooking.show()
     }
 
+    private fun availabiltyCheck(from:Int, to:Int): Boolean{
+
+        return true
+    }
+
+    //Populating layout with bookings
     private fun setBookings(venueName: String) {
         val filteredBookings: ArrayList<Booking> = ArrayList()
+        val availableSlotsFrom: ArrayList<Int>
+        val availableSlotsTo: ArrayList<Int>
+
         if (bookings != null){
+            var dateFrom:ArrayList<String>
+            var dateTo:ArrayList<String>
+
+            availableSlotsFrom = ArrayList()
+            availableSlotsTo = ArrayList()
+            var temp = 0
             for(booking: Booking in bookings!!){
-                if ((booking.getVenue().getName() == venueName) && (booking.getBookingDate() == dt))
+                if ((booking.getVenue().getName() == venueName) && (booking.getBookingDate() == dt)) {
                     filteredBookings.add(booking)
+
+                    //Parsing dates
+                    dateFrom = booking.getStartTime().split(":") as ArrayList<String>
+                    dateTo = booking.getDurationOfBooking().split(":") as ArrayList<String>
+
+                    //Converting dates in seconds to do some calculations
+                    val dateFromInSeconds = ((dateFrom[0].toInt() * 3600) + (dateFrom[1].toInt() * 60))
+                    val dateToInSeconds = ((dateTo[0].toInt() * 3600) + (dateTo[1].toInt() * 60))
+
+                    //Make available slots list
+                    availableSlotsFrom.add(temp)
+                    availableSlotsTo.add(dateFromInSeconds)
+                    temp = dateToInSeconds
+                }
             }
-            if (filteredBookings.isNotEmpty()){
-                progressBar.visibility = View.INVISIBLE
-                bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
-                bookingsRecycler.adapter.notifyDataSetChanged()
-            }else{
-                progressBar.visibility = View.INVISIBLE
-                bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
-                bookingsRecycler.adapter.notifyDataSetChanged()
-                Toast.makeText(context, "No booking found of this venue", Toast.LENGTH_SHORT).show()
-            }
+            availableSlotsFrom.add(temp)
+            availableSlotsTo.add(86400)
+
+            availableSlotsFrom.sort()
+            availableSlotsTo.sort()
+            Log.d(TAG, "Avail from $availableSlotsFrom")
+            Log.d(TAG, "Avail to $availableSlotsTo")
+
+            hideProgressDialog()
+            bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
+            bookingsRecycler.adapter.notifyDataSetChanged()
         }else{
-            progressBar.visibility = View.INVISIBLE
+            hideProgressDialog()
             Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    //User entertainment
+    private fun showProgressDialog() {
+        val builder = AlertDialog.Builder(context)
+        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
+        val loader = dialogView.findViewById<ImageView>(R.id.loadingProgressbar)
+        builder.setView(dialogView)
+        builder.setCancelable(false)
+        dialog = builder.create()
+        dialog!!.window.setLayout(600,400)
+        dialog!!.show()
+        animation = loader.drawable as AnimationDrawable
+        animation.start()
+        activity!!.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+    }
+    private fun hideProgressDialog(){
+        animation.stop()
+        dialog!!.dismiss()
+        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 }

@@ -40,6 +40,4 @@ class LoginPhoneFragment : Fragment() {
 
         return view
     }
-
-
 }

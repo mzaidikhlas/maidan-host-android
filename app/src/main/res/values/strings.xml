@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Maidan Host</string>
+    <string name="app_name">Maidan</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -18,6 +18,13 @@
         <item>Male</item>
         <item>Female</item>
         <item>Other</item>
+    </string-array>
+
+    <!--Stats Fragment-->
+    <string-array name="earningSelection">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
     </string-array>
 
     <string name="Book">BOOK</string>

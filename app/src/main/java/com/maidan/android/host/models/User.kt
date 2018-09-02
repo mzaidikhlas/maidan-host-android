@@ -5,7 +5,7 @@ import java.io.Serializable
 data class User(private var email: String, private var name: String, private var password: String?,
                 private var phone: String, private var cnic: String, private var displayAvatar: String?,
                 private var dob: String, private var gender: String, private var isClient: Boolean,
-                private var isOwner: Boolean, private var userRecord: UserRecord?, private var venues: ArrayList<Venue>): Serializable {
+                private var isOwner: Boolean, private var userRecord: UserRecord?, private var venues: ArrayList<Venue>?): Serializable {
 
     //Getters
     fun getIsClient():Boolean{return this.isClient}

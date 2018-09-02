@@ -51,9 +51,9 @@ class LoginPhoneVerificationFragment : Fragment() {
                 verifyCodeEdtTxt.error = "Enter code ..."
                 verifyCodeEdtTxt.requestFocus()
             }else{
+                showProgressBar()
                 val credential = PhoneAuthProvider.getCredential(verificationId, code)
                 signInWithCredential (credential)
-                Toast.makeText(context, "Hey $code", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -78,17 +78,20 @@ class LoginPhoneVerificationFragment : Fragment() {
         }
 
         override fun onVerificationCompleted(p0: PhoneAuthCredential?) {
+            showProgressBar()
             val code = p0!!.smsCode
             if (code.isNullOrEmpty() || code!!.length < 6){
                 verifyCodeEdtTxt.error = "Enter code.."
                 verifyCodeEdtTxt.requestFocus()
+                disableProgressbar()
             }else{
                 signInWithCredential(p0)
             }
         }
 
         override fun onVerificationFailed(p0: FirebaseException?) {
-            Log.d("LoginActivity", p0.toString())
+            disableProgressbar()
+            Log.d("LoginActivity", "Error ...... $p0")
             fragmentManager!!.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
             Toast.makeText(context, "Error ${p0!!.message}", Toast.LENGTH_SHORT).show()
         }
@@ -99,10 +102,12 @@ class LoginPhoneVerificationFragment : Fragment() {
         FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener { task ->
             if (task.isSuccessful){
                 Toast.makeText(context, "Successful", Toast.LENGTH_SHORT).show()
-                val intent = Intent(context, LoadingActivity::class.java)
+                val intent = Intent(context, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                disableProgressbar()
                 startActivity(intent)
             }else {
+                disableProgressbar()
                 // Sign in failed, display a message and update the UI
                 Log.w("LoginActivity", "signInWithCredential:failure", task.exception)
                 if (task.exception is FirebaseAuthInvalidCredentialsException) {
@@ -111,6 +116,15 @@ class LoginPhoneVerificationFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showProgressBar(){
+        verifyCodeProgressBar.visibility = View.VISIBLE
+        verifyCodeBtn.isEnabled = false
+    }
+    private fun disableProgressbar(){
+        verifyCodeProgressBar.visibility = View.INVISIBLE
+        verifyCodeBtn.isEnabled = true
     }
 
 }

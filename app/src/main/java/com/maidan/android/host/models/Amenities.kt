@@ -1,5 +1,7 @@
 package com.maidan.android.host.models
 
-class Amenities {
+import java.io.Serializable
+
+class Amenities: Serializable {
 
 }
