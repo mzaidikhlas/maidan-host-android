@@ -1,0 +1,15 @@
+#Internal package file, do not edit.
+#Sun Sep 02 06:55:54 PKT 2018
+1.base=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/assets/release
+2.path=crashlytics-build.properties
+0.baseType=DIRECTORY
+2.base=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/assets/release
+2.set=ASSET
+1.baseType=DIRECTORY
+count=3
+1.set=ASSET
+0.path=anychart-ui.min.css
+0.set=ASSET
+0.base=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/assets/release
+2.baseType=DIRECTORY
+1.path=anychart-bundle.min.js
