@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -22,22 +23,32 @@ class LoginPhoneFragment : Fragment() {
         phoneEdtTxt = view.findViewById(R.id.loginPhoneNo)
         submitBtn = view.findViewById(R.id.login_btn)
 
-        submitBtn.setOnClickListener{
-            val number = phoneEdtTxt.text.toString()
-            if (number.isEmpty() || number.length < 10){
-                phoneEdtTxt.error = "Valid number is required"
-                phoneEdtTxt.requestFocus()
-            }else{
-                val numStr = "+92$number"
-                val verifyNumber = LoginPhoneVerificationFragment()
-                val bundle = Bundle()
-                bundle.putString("phonenumber", numStr)
-                verifyNumber.arguments = bundle
-                fragmentManager!!.beginTransaction().addToBackStack("loginPhoneFragment").replace(R.id.login_fragment_layout, verifyNumber).commit()
-                Toast.makeText(context, "Number is $numStr", Toast.LENGTH_SHORT).show()
+        phoneEdtTxt.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                doAction()
             }
+            false
+        }
+
+        submitBtn.setOnClickListener{
+            doAction()
         }
 
         return view
+    }
+    private fun doAction(){
+        val number = phoneEdtTxt.text.toString()
+        if (number.isEmpty() || number.length < 10){
+            phoneEdtTxt.error = "Valid number is required"
+            phoneEdtTxt.requestFocus()
+        }else{
+            val numStr = "+92$number"
+            val verifyNumber = LoginPhoneVerificationFragment()
+            val bundle = Bundle()
+            bundle.putString("phonenumber", numStr)
+            verifyNumber.arguments = bundle
+            fragmentManager!!.beginTransaction().addToBackStack("loginPhoneFragment").replace(R.id.login_fragment_layout, verifyNumber).commit()
+            Toast.makeText(context, "Number is $numStr", Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -27,11 +27,10 @@
         android:id="@+id/from_Time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="32dp"
         android:text="12:00"
         android:textSize="36sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/hyp"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
@@ -54,19 +53,18 @@
         android:id="@+id/to_Time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="176dp"
+        android:layout_marginEnd="16dp"
         android:text="03:00"
         android:textSize="36sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/hyp"
+        app:layout_constraintEnd_toStartOf="@+id/AMPM"
         app:layout_constraintTop_toBottomOf="@+id/venue_specific" />
 
     <TextView
         android:id="@+id/AMPM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="96dp"
+        android:layout_marginEnd="32dp"
         android:text="AM"
         android:textSize="36sp"
         app:layout_constraintBottom_toTopOf="@+id/StatusText"
@@ -93,14 +91,13 @@
 
     <TextView
         android:id="@+id/StatusText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:layout_marginStart="150dp"
         android:text="Status:"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/divider"
-        app:layout_constraintStart_toEndOf="@+id/user_Name"
+        app:layout_constraintEnd_toStartOf="@+id/status"
         app:layout_constraintTop_toBottomOf="@+id/AMPM" />
 
     <TextView
@@ -108,18 +105,15 @@
         android:layout_width="wrap_content"
         android:layout_height="23dp"
         android:layout_marginBottom="10dp"
-        android:layout_marginEnd="44dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginEnd="16dp"
         android:text="Booked"
         android:textColor="@color/green"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/StatusText"
         app:layout_constraintTop_toBottomOf="@+id/AMPM"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" />
 
 
         <View
@@ -137,14 +131,15 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
         android:text="Ahmad Ali"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/by"
         app:layout_constraintTop_toBottomOf="@+id/from_Time"
-        app:layout_constraintVertical_bias="0.416" />
+        app:layout_constraintVertical_bias="0.0" />
 
 
     </android.support.constraint.ConstraintLayout>

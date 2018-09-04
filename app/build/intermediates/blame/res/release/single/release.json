@@ -101,7 +101,7 @@
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/layout_view_anychart.xml.flat",
-        "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/AnyChart-Android-0.3.0.aar/9161e3e9d4b7216baf8649bba0c29f04/res/layout/view_anychart.xml"
+        "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/AnyChart-Android-1.0.1.aar/249dde93aa7e773af31a6aa1d553b196/res/layout/view_anychart.xml"
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/anim_abc_shrink_fade_out_from_bottom.xml.flat",
@@ -302,6 +302,10 @@
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/layout_abc_activity_chooser_view.xml.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/4bd9b91896381a57233b83149eb6dccc/res/layout/abc_activity_chooser_view.xml"
+    },
+    {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable_frame00.png.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/drawable/frame00.png"
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-mdpi-v4_abc_scrubber_control_to_pressed_mtrl_005.png.flat",
@@ -522,6 +526,10 @@
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-hdpi-v4_abc_ic_menu_paste_mtrl_am_alpha.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/4bd9b91896381a57233b83149eb6dccc/res/drawable-hdpi-v4/abc_ic_menu_paste_mtrl_am_alpha.png"
+    },
+    {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable_loader_styles.xml.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/drawable/loader_styles.xml"
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-v23_abc_control_background_material.xml.flat",
@@ -1300,6 +1308,10 @@
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/facebook-share-4.34.0.aar/48bef082999b967ff8437f30e3d57b40/res/drawable-mdpi-v4/com_facebook_button_send_icon_blue.png"
     },
     {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/layout_all_ground_detail.xml.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/layout/all_ground_detail.xml"
+    },
+    {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-xhdpi-v4_abc_ic_star_black_36dp.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/4bd9b91896381a57233b83149eb6dccc/res/drawable-xhdpi-v4/abc_ic_star_black_36dp.png"
     },
@@ -1648,6 +1660,10 @@
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/support-compat-27.1.1.aar/7fd207f92fbbec32369e528e34b540f9/res/drawable/notification_icon_background.xml"
     },
     {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable_cancel_bg.xml.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/drawable/cancel_bg.xml"
+    },
+    {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-xxhdpi-v4_abc_ic_menu_paste_mtrl_am_alpha.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/4bd9b91896381a57233b83149eb6dccc/res/drawable-xxhdpi-v4/abc_ic_menu_paste_mtrl_am_alpha.png"
     },
@@ -1778,6 +1794,10 @@
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-xhdpi-v4_messenger_bubble_small_blue.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/facebook-messenger-4.34.0.aar/9dface4fc8e0575e72b45c6d2930d59e/res/drawable-xhdpi-v4/messenger_bubble_small_blue.png"
+    },
+    {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable_upload_image_64.png.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/drawable/upload_image_64.png"
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-xhdpi-v4_abc_cab_background_top_mtrl_alpha.9.png.flat",
@@ -2252,6 +2272,10 @@
         "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/drawable/frame06.png"
     },
     {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/layout_add_ground.xml.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/layout/add_ground.xml"
+    },
+    {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-mdpi-v4_com_facebook_button_icon_blue.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/facebook-common-4.34.0.aar/d3153c3edfe39d3adf471c05744907f7/res/drawable-mdpi-v4/com_facebook_button_icon_blue.png"
     },
@@ -2494,6 +2518,10 @@
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-xhdpi-v4_abc_list_focused_holo.9.png.flat",
         "source": "/Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/appcompat-v7-27.1.1.aar/4bd9b91896381a57233b83149eb6dccc/res/drawable-xhdpi-v4/abc_list_focused_holo.9.png"
+    },
+    {
+        "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/layout_all_grounds.xml.flat",
+        "source": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/res/layout/all_grounds.xml"
     },
     {
         "merged": "/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/res/merged/release/drawable-ldrtl-hdpi-v17_abc_ic_menu_copy_mtrl_am_alpha.png.flat",

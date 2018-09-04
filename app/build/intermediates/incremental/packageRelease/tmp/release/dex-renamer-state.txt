@@ -1,7 +1,10 @@
-#Mon Sep 03 13:23:13 PKT 2018
-base.0=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/release/34
+#Tue Sep 04 20:55:10 PKT 2018
+path.2=classes3.dex
 path.1=classes2.dex
-renamed.1=classes2.dex
 path.0=classes.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
 renamed.0=classes.dex
-base.1=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/release/34
+base.2=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/release/0
+base.1=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/release/0
+base.0=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/release/0

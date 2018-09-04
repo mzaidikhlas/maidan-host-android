@@ -6,58 +6,61 @@
     android:layout_height="match_parent"
     tools:context=".controller.DailyBookingFragment">
 
+    <Button
+        android:id="@+id/dailyBookingBack"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:background="@null"
+        android:drawableStart="@drawable/right_arrow"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/dailyBookingVenuesSpinner"
+        style="@style/venueSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:elevation="8dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/light_green_to_dark_green_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="219dp"
+        android:layout_height="167dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/nav_gradient"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dailyBookingVenuesSpinner">
 
-        <Button
-            android:id="@+id/dailyBookingBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:background="@null"
-            android:drawableStart="@drawable/right_arrow"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/bookingDate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="115dp"
-            android:layout_marginEnd="145dp"
-            android:layout_marginStart="146dp"
-            android:layout_marginTop="115dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="44dp"
             android:text="30th July 2018"
             android:textColor="@color/white"
-            android:textSize="48sp"
+            android:textSize="28sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Spinner
-            android:id="@+id/dailyBookingVenuesSpinner"
-            android:layout_width="0dp"
-            style="@style/venueSpinner"
-            android:layout_height="45dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="32dp"
-            android:background="@null"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/dailyBookingBack"
             app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
 
+
+    </android.support.constraint.ConstraintLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/dailyBooking"
         android:layout_width="0dp"

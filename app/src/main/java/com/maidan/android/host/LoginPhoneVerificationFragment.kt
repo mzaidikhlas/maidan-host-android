@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -44,20 +45,30 @@ class LoginPhoneVerificationFragment : Fragment() {
 
         sendVerificationCode(number)
 
-        verifyCodeBtn.setOnClickListener {
-            val code = verifyCodeEdtTxt.text.toString()
-
-            if (code.isEmpty() || code.length < 6){
-                verifyCodeEdtTxt.error = "Enter code ..."
-                verifyCodeEdtTxt.requestFocus()
-            }else{
-                showProgressBar()
-                val credential = PhoneAuthProvider.getCredential(verificationId, code)
-                signInWithCredential (credential)
+        verifyCodeEdtTxt.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                doAction()
             }
+            false
+        }
+        verifyCodeBtn.setOnClickListener {
+            doAction()
         }
 
         return view
+    }
+
+    private fun doAction() {
+        val code = verifyCodeEdtTxt.text.toString()
+
+        if (code.isEmpty() || code.length < 6){
+            verifyCodeEdtTxt.error = "Enter code ..."
+            verifyCodeEdtTxt.requestFocus()
+        }else{
+            showProgressBar()
+            val credential = PhoneAuthProvider.getCredential(verificationId, code)
+            signInWithCredential (credential)
+        }
     }
 
     private fun sendVerificationCode(number: String){

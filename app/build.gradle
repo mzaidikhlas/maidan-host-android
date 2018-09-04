@@ -57,8 +57,7 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     //Stats Charts
-    implementation 'com.github.AnyChart:AnyChart-Android:0.3.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.github.AnyChart:AnyChart-Android:1.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

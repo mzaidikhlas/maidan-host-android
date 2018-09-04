@@ -15,10 +15,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.maidan.android.host.MainActivity
 
 import com.maidan.android.host.R
 import com.maidan.android.host.adaptor.DateBookingAdapter
@@ -28,7 +28,6 @@ import com.maidan.android.host.models.User
 import com.maidan.android.host.models.Venue
 import com.maidan.android.host.retrofit.ApiInterface
 import com.maidan.android.host.retrofit.ApiResponse
-import com.maidan.android.host.retrofit.PayloadFormat
 import com.maidan.android.host.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -49,11 +48,12 @@ class DailyBookingFragment : Fragment() {
     private lateinit var venuesSpinner: Spinner
     private lateinit var backBtn: Button
 
-    private var dialog: AlertDialog? = null
-    private lateinit var animation: AnimationDrawable
+    private var availableSlotsFrom: ArrayList<Int>? = null
+    private var availableSlotsTo: ArrayList<Int>? = null
 
     private var dt: String? = null
     private val TAG = "BookingDailyFragment"
+    private var count = 1
 
     //Firebase
     private lateinit var mAuth: FirebaseAuth
@@ -75,9 +75,17 @@ class DailyBookingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "OnCreate")
-        if (savedInstanceState != null) {
-            loggedInUser = savedInstanceState.getSerializable("loggedInUser") as User
-        }
+
+        loggedInUser = (activity as MainActivity).getLoggedInUser()
+
+        //Getting bundle data
+        if (arguments != null) {
+            dt = arguments!!.getString("date")
+            bookings = arguments!!.get("bookings") as ArrayList<Booking>?
+        } else Log.d(TAG, "Arguments empty")
+
+        mAuth = FirebaseAuth.getInstance()
+        currentUser = mAuth.currentUser!!
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -87,9 +95,6 @@ class DailyBookingFragment : Fragment() {
         if (view != null) Log.d(TAG, "Reusing view")
 
         val view = if (view != null) view else inflater.inflate(R.layout.fragment_daily_booking, container, false)
-
-        mAuth = FirebaseAuth.getInstance()
-        currentUser = mAuth.currentUser!!
 
         //Layouts init
         dateTxt = view!!.findViewById(R.id.bookingDate)
@@ -101,15 +106,6 @@ class DailyBookingFragment : Fragment() {
 
         //populating layout
         dateTxt.text = dt
-
-        //Getting bundle data
-        if (loggedInUser == null) {
-            if (arguments != null) {
-                dt = arguments!!.getString("date")
-                bookings = arguments!!.get("bookings") as ArrayList<Booking>?
-                loggedInUser = arguments!!.get("loggedInUser") as User
-            } else Log.d(TAG, "Arguments empty")
-        }else Log.d(TAG, "LoggedInUser $loggedInUser")
 
         //Setting up recycler view for bookings
         bookingsRecycler.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -140,7 +136,11 @@ class DailyBookingFragment : Fragment() {
                     venuesSpinner.requestFocus()
                 }
             }
-        }else popupBooking.isEnabled = false
+        }else {
+            popupBooking.isEnabled = false
+            Log.d(TAG, "No venues")
+            Toast.makeText(context, "You cannot book now. Please ask maidan to add your venues", Toast.LENGTH_LONG).show()
+        }
 
         //New booking popup init
         popupAddBooking = Dialog(context)
@@ -186,7 +186,7 @@ class DailyBookingFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         Log.d(TAG, "OnSaveInstanceState")
-        outState.putSerializable("loggedInUser", loggedInUser)
+        outState.putInt("count", count++)
     }
 
     override fun onDestroy() {
@@ -231,9 +231,11 @@ class DailyBookingFragment : Fragment() {
                                     hideProgressDialog()
                                 }
                             }else{
+                                Toast.makeText(context, "For some reason booking not created", Toast.LENGTH_LONG).show()
                                 hideProgressDialog()
                             }
                        }else{
+                           Toast.makeText(context, "Some thing is wrong with making server call", Toast.LENGTH_LONG).show()
                            hideProgressDialog()
                        }
                    }
@@ -256,6 +258,9 @@ class DailyBookingFragment : Fragment() {
         bookNow = popupAddBooking.findViewById(R.id.book)
 
         bookNow.letterSpacing = 0.3F
+
+        if (fromTimeSeconds == null)
+            newBookingToTxt.isEnabled = false
 
         bookNow.setOnClickListener {
             Log.d(TAG, "Book")
@@ -282,12 +287,15 @@ class DailyBookingFragment : Fragment() {
                     val transaction = Transaction(convenienceFee, playHrs, pricePerHr, total, taxes, "manualCashReceiving")
                     Log.d(TAG, "Transaction $transaction")
 
-                    //Initializing booking object
-                    val newBooking = Booking(venue,transaction,loggedInUser!!,
-                            newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, "booked")
 
-                    //Creating new booking in db
-                    createBooking(newBooking)
+                    if (availabiltyFromCheck(fromTimeSeconds!!) && availabiltyToCheck(toTimeSeconds!!)){
+                        //Initializing booking object
+                        val newBooking = Booking(venue,transaction,loggedInUser!!,
+                                newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, "booked")
+
+                        //Creating new booking in db
+                        createBooking(newBooking)
+                    }
                 }else{
                     newBookingToTxt.error = "Please enter correct time"
                 }
@@ -310,18 +318,34 @@ class DailyBookingFragment : Fragment() {
             val c = Calendar.getInstance()
             val hourOfDay = c.get(Calendar.HOUR_OF_DAY)
             val minute = c.get(Calendar.MINUTE)
-
+            var h = hourOfDay
+            var m = minute
             // Launch Time Picker Dialog
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
                         //Converting time in seconds for validation check
                         fromTimeSeconds = ((hr*3600)+(min*60))
-                        Log.d(TAG, "To time $fromTimeSeconds")
+
+                        if (!availabiltyFromCheck(fromTimeSeconds!!)){
+                            newBookingFromTxt.error = "This slot is not available"
+                            newBookingFromTxt.requestFocus()
+                        }
+                        else {
+                            newBookingToTxt.isEnabled = true
+                            Log.d(TAG, "From true")
+                            newBookingFromTxt.error = null
+                            newBookingFromTxt.clearFocus()
+                        }
+
+                        Log.d(TAG, "From time $fromTimeSeconds")
 
                         Log.d(TAG, "Hour: $hr, Min: $min")
+                        h = hr
+                        m = min
                         val timeString = "$hr:$min"
                         newBookingFromTxt.text = timeString
-                    }, hourOfDay, minute, true)
+                    }, hourOfDay, minute, false)
+            timePickerDialog.updateTime(h,m)
             timePickerDialog.show()
 
         }
@@ -329,64 +353,101 @@ class DailyBookingFragment : Fragment() {
             val c = Calendar.getInstance()
             val hourOfDay = c.get(Calendar.HOUR_OF_DAY)
             val minute = c.get(Calendar.MINUTE)
-
+            var h = hourOfDay
+            var m = minute
             // Launch Time Picker Dialog
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
                         //Converting time in seconds for validation check
                         toTimeSeconds = ((hr*3600)+(min*60))
-                        Log.d(TAG, "From time $toTimeSeconds")
+
+                        if (!availabiltyToCheck(toTimeSeconds!!)){
+                            Log.d(TAG, "To false")
+                            newBookingToTxt.error = "This slot is not available"
+                            newBookingToTxt.requestFocus()
+                        }
+                        else {
+                            Log.d(TAG, "To true")
+                            newBookingToTxt.error = null
+                            newBookingToTxt.clearFocus()
+                        }
+
+                        Log.d(TAG, "To time $toTimeSeconds")
 
                         Log.d(TAG, "Hour: $hr, Min: $min")
+                        h = hr
+                        m = min
                         val timeString = "$hr:$min"
                         newBookingToTxt.text = timeString
-                    }, hourOfDay, minute, true)
+                    }, hourOfDay, minute, false)
+            timePickerDialog.updateTime(h,m)
             timePickerDialog.show()
         }
         popupAddBooking.show()
     }
 
-    private fun availabiltyCheck(from:Int, to:Int): Boolean{
+    private fun availabiltyFromCheck(from: Int): Boolean{
+        var i = 0
+        var flag = false
 
+        while (i < availableSlotsFrom!!.size){
+            if (from >= availableSlotsFrom!![i])
+                if (from <= availableSlotsTo!![i])
+                    flag = true
+            i++
+        }
+        return flag
+    }
+    private fun availabiltyToCheck(to: Int): Boolean{
+        var i = 0
+        var flag = false
+
+        while (i < availableSlotsTo!!.size){
+            if (to <= availableSlotsTo!![i])
+                if (to >= availableSlotsFrom!![i])
+                    flag = true
+            i++
+        }
+        return flag
+    }
+
+    private fun availabiltyCheck(from:Int, to:Int): Boolean{
         return true
     }
 
     //Populating layout with bookings
     private fun setBookings(venueName: String) {
         val filteredBookings: ArrayList<Booking> = ArrayList()
-        val availableSlotsFrom: ArrayList<Int>
-        val availableSlotsTo: ArrayList<Int>
+        availableSlotsFrom = ArrayList()
+        availableSlotsTo = ArrayList()
 
         if (bookings != null){
-            var dateFrom:ArrayList<String>
-            var dateTo:ArrayList<String>
-
-            availableSlotsFrom = ArrayList()
-            availableSlotsTo = ArrayList()
+            var timeFrom:ArrayList<String>
+            var timeTo:ArrayList<String>
             var temp = 0
             for(booking: Booking in bookings!!){
                 if ((booking.getVenue().getName() == venueName) && (booking.getBookingDate() == dt)) {
                     filteredBookings.add(booking)
 
                     //Parsing dates
-                    dateFrom = booking.getStartTime().split(":") as ArrayList<String>
-                    dateTo = booking.getDurationOfBooking().split(":") as ArrayList<String>
+                    timeFrom = booking.getStartTime().split(":") as ArrayList<String>
+                    timeTo = booking.getDurationOfBooking().split(":") as ArrayList<String>
 
                     //Converting dates in seconds to do some calculations
-                    val dateFromInSeconds = ((dateFrom[0].toInt() * 3600) + (dateFrom[1].toInt() * 60))
-                    val dateToInSeconds = ((dateTo[0].toInt() * 3600) + (dateTo[1].toInt() * 60))
+                    val timeFromInSeconds = ((timeFrom[0].toInt() * 3600) + (timeFrom[1].toInt() * 60))
+                    val timeToInSeconds = ((timeTo[0].toInt() * 3600) + (timeTo[1].toInt() * 60))
 
                     //Make available slots list
-                    availableSlotsFrom.add(temp)
-                    availableSlotsTo.add(dateFromInSeconds)
-                    temp = dateToInSeconds
+                    availableSlotsFrom!!.add(temp)
+                    availableSlotsTo!!.add(timeFromInSeconds)
+                    temp = timeToInSeconds
                 }
             }
-            availableSlotsFrom.add(temp)
-            availableSlotsTo.add(86400)
+            availableSlotsFrom!!.add(temp)
+            availableSlotsTo!!.add(86400)
 
-            availableSlotsFrom.sort()
-            availableSlotsTo.sort()
+            availableSlotsFrom!!.sort()
+            availableSlotsTo!!.sort()
             Log.d(TAG, "Avail from $availableSlotsFrom")
             Log.d(TAG, "Avail to $availableSlotsTo")
 
@@ -394,6 +455,8 @@ class DailyBookingFragment : Fragment() {
             bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
             bookingsRecycler.adapter.notifyDataSetChanged()
         }else{
+            availableSlotsFrom!!.add(0)
+            availableSlotsTo!!.add(86400)
             hideProgressDialog()
             Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
         }
@@ -401,22 +464,9 @@ class DailyBookingFragment : Fragment() {
 
     //User entertainment
     private fun showProgressDialog() {
-        val builder = AlertDialog.Builder(context)
-        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
-        val loader = dialogView.findViewById<ImageView>(R.id.loadingProgressbar)
-        builder.setView(dialogView)
-        builder.setCancelable(false)
-        dialog = builder.create()
-        dialog!!.window.setLayout(600,400)
-        dialog!!.show()
-        animation = loader.drawable as AnimationDrawable
-        animation.start()
-        activity!!.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        (activity as MainActivity).showProgressDialog()
     }
     private fun hideProgressDialog(){
-        animation.stop()
-        dialog!!.dismiss()
-        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        (activity as MainActivity).hideProgressDialog()
     }
 }

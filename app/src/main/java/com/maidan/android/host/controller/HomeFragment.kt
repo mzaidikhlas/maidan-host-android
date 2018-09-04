@@ -1,9 +1,6 @@
 package com.maidan.android.host.controller
 
-import android.app.AlertDialog
 import android.content.Context
-import android.graphics.drawable.AnimationDrawable
-import android.nfc.Tag
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -12,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -34,6 +30,8 @@ import kotlin.collections.ArrayList
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
+import com.maidan.android.host.MainActivity
+import java.text.DateFormat
 
 class HomeFragment : Fragment() {
 
@@ -42,11 +40,8 @@ class HomeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var homeCalender: CalendarView
     private lateinit var progressBar: ProgressBar
-    private lateinit var dateString: String
     private lateinit var venuesSpinner: Spinner
     private lateinit var displayBookings: ArrayList<Booking>
-    private var dialog: AlertDialog? = null
-    private lateinit var animation: AnimationDrawable
 
     private var loggedInUser: User? = null
 
@@ -68,19 +63,11 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "OnCreate")
 
         if (savedInstanceState != null) {
-            loggedInUser = savedInstanceState.getSerializable("loggedInUser") as User
-        }else{
-            if (arguments != null) {
-                loggedInUser = arguments!!.get("loggedInUser") as User
-                Log.d(TAG, loggedInUser.toString())
-            }
-        }
-
-        //Preventing user to create booking when this user dont have any venue
-        if (loggedInUser!!.getVenues() == null){
-            Log.d(TAG, "No venues")
-            Toast.makeText(context, "You dont have added any ground please ask maidan team for updates", Toast.LENGTH_LONG).show()
-        }
+            Log.d(TAG, "OnCreate: save state")
+            showProgressDialog()
+        }else Log.d(TAG, "OnCreate: no state")
+        loggedInUser = (activity as MainActivity).getLoggedInUser()
+        Log.d(TAG, loggedInUser.toString())
 
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
@@ -93,6 +80,11 @@ class HomeFragment : Fragment() {
         if (view != null) Log.d(TAG, "Reusing view")
 
         val view = if (view != null) view else inflater.inflate(R.layout.fragment_home, container, false)
+
+        if (savedInstanceState != null) {
+            Log.d(TAG, "A rha hai")
+            showProgressDialog()
+        }
 
         progressBar = view!!.findViewById(R.id.bookingProgressBar)
         venuesSpinner = view.findViewById(R.id.homeVenuesSpinner)
@@ -121,18 +113,24 @@ class HomeFragment : Fragment() {
                     venuesSpinner.requestFocus()
                 }
             }
+        }else {
+            hideProgressDialog()
+            Log.d(TAG, "No venues")
+            Toast.makeText(context, "You dont have added any ground please ask maidan team for updates", Toast.LENGTH_LONG).show()
         }
+
         //Calender
         val c: Calendar = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
-        dateString = "$day/$month/$year"
+        val dateFormat = DateFormat.getDateInstance(DateFormat.FULL).format(c.time)
+        Log.d(TAG, "Date format $dateFormat")
         homeCalender.setOnDateChangeListener { calenderView, y, m, d ->
-            dateString = "$d/$m/$y"
+            val selectedCalender = Calendar.getInstance()
+            selectedCalender.set(y,m,d)
+            val selectedDate = DateFormat.getDateInstance(DateFormat.FULL).format(selectedCalender.time)
+            Log.d(TAG, selectedDate)
             val dailyBookingFragment = DailyBookingFragment()
             val bundle = Bundle()
-            bundle.putString("date", dateString)
+            bundle.putString("date", selectedDate)
             if (bookings != null)
                 bundle.putSerializable("bookings", bookings)
             else Log.d(TAG, "Bookings empty in home")
@@ -141,7 +139,6 @@ class HomeFragment : Fragment() {
             fragmentManager!!.beginTransaction().addToBackStack("homeFragment").replace(R.id.fragment_layout, dailyBookingFragment).commit()
         }
         homeCalender.minDate = c.timeInMillis
-        Log.d(TAG, dateString)
 
         //bookings recyclerview
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -196,7 +193,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun getBookingsWithOwner(venueName: String) {
-        showProgressDialog()
+        if (isStateSaved){
+            Log.d(TAG, "Save state")
+            showProgressDialog()
+        }else{
+            Log.d(TAG, "No state")
+        }
 
         currentUser.getIdToken(true).addOnCompleteListener{task ->
             if (task.isSuccessful){
@@ -206,7 +208,8 @@ class HomeFragment : Fragment() {
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                         hideProgressDialog()
-                        throw t!!
+                        Toast.makeText(context, "Error $t", Toast.LENGTH_LONG).show()
+                        Log.d(TAG, "Error $t")
                     }
 
                     override fun onResponse(call: Call<ApiResponse>?, response: Response<ApiResponse>?) {
@@ -231,7 +234,7 @@ class HomeFragment : Fragment() {
                                                 displayBookings.add(booking)
                                         }
                                         Log.d(TAG, "Bookings call $bookings")
-                                        hideProgressDialog()
+                                        (activity as MainActivity).hideProgressDialog()
                                         recyclerView.adapter = BookingInfoAdaptor(displayBookings)
                                         recyclerView.adapter.notifyDataSetChanged()
                                     }else{
@@ -255,26 +258,12 @@ class HomeFragment : Fragment() {
             }
         }
     }
-
+    //User entertainment
     private fun showProgressDialog() {
-        val builder = AlertDialog.Builder(context)
-        val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
-        val loader = dialogView.findViewById<ImageView>(R.id.loadingProgressbar)
-        builder.setView(dialogView)
-        builder.setCancelable(false)
-        dialog = builder.create()
-        dialog!!.window.setLayout(600,400)
-        dialog!!.show()
-        animation = loader.drawable as AnimationDrawable
-        animation.start()
-        activity!!.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        (activity as MainActivity).showProgressDialog()
     }
-
     private fun hideProgressDialog(){
-        animation.stop()
-        dialog!!.dismiss()
-        activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        (activity as MainActivity).hideProgressDialog()
     }
 }
 

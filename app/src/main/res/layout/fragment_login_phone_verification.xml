@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,8 +7,12 @@
     android:background="@drawable/light_green_to_dark_green_1"
     tools:context=".LoginPhoneVerificationFragment">
 
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/ownerName"
         android:layout_width="wrap_content"
         android:layout_height="41dp"
         android:layout_marginEnd="32dp"
@@ -37,7 +41,7 @@
         android:textSize="78sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/ownerName" />
 
     <TextView
         android:id="@+id/textView13"
@@ -56,6 +60,7 @@
     <EditText
         android:id="@+id/verifyNumberCode"
         style="@style/email_password_login"
+        android:imeOptions="actionDone"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginEnd="32dp"
@@ -72,7 +77,6 @@
         android:id="@+id/verifyCodeBtn"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="204dp"
         android:layout_marginEnd="148dp"
         android:layout_marginStart="148dp"
         android:layout_marginTop="50dp"
@@ -80,21 +84,20 @@
         android:text="Verify"
         android:textColor="#717171"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verifyNumberCode"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/verifyNumberCode" />
 
     <ProgressBar
         android:id="@+id/verifyProgressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="83dp"
+        android:layout_marginTop="32dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verifyCodeBtn" />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

@@ -22,6 +22,9 @@ import retrofit2.Response
 import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.auth.FirebaseUser
+import com.maidan.android.host.models.Location
+import com.maidan.android.host.models.Rate
+import com.maidan.android.host.models.Venue
 import java.util.*
 
 
@@ -38,7 +41,6 @@ class SignupDetailsActivity : AppCompatActivity() {
     // Upload Image
     private var PICK_IMAGE = 100
     private var imageUri : Uri? = null
-    private var displayAvatar: String? = null
 
     //layout
     private lateinit var userImage: ImageButton
@@ -82,7 +84,7 @@ class SignupDetailsActivity : AppCompatActivity() {
 
             dateString = "$day/$month/$year"
 
-            dobPicker = DatePickerDialog(this,R.style.SpinnerDatePicker,
+            dobPicker = DatePickerDialog(this,android.R.style.Theme_Holo_Dialog,
                     DatePickerDialog.OnDateSetListener { view, yr, monthOfYear, dayOfMonth ->
                         Log.d(TAG, "Year: $yr, Month $monthOfYear, Day: $dayOfMonth")
 
@@ -202,28 +204,28 @@ class SignupDetailsActivity : AppCompatActivity() {
     }
 
     private fun createUser (avatar: String?){
-//        val venue = Venue("Venue 1",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//            ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//        val venue2 = Venue("Venue 2",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//                ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//
-//        val venue3 = Venue("Venue 3",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//                ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//        val venues = ArrayList<Venue>()
-//        venues.add(venue)
-//        venues.add(venue2)
-//        venues.add(venue3)
+        val venue = Venue("Venue 1",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+            ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+        val venue2 = Venue("Venue 2",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+                ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+
+        val venue3 = Venue("Venue 3",
+                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+                ,null, true, null, null, "Cricket",
+                Rate(1500, 100, 100, 2,8),
+                3, "32123","123123")
+        val venues = ArrayList<Venue>()
+        venues.add(venue)
+        venues.add(venue2)
+        venues.add(venue3)
         user = User(emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
-                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, null)
+                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, venues)
 
         Log.d(TAG, "User: $user")
 

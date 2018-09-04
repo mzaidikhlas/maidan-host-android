@@ -33,21 +33,22 @@ class MainActivity : AppCompatActivity() {
     private var dialog: AlertDialog? = null
     private lateinit var animation: AnimationDrawable
 
-    var loggedInUser: User? = null
+    private var loggedInUser: User? = null
     private val TAG = "MainActivity"
 
     private val mOnNavigationItemSelectedListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
-                redirect()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
+                //redirect()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_dashboard -> {
-              supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, DashboardFragment()).commit()
+              supportFragmentManager.beginTransaction().replace(R.id.fragment_layout,StatsFragment()).commit()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, StatsFragment()).commit()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, DashboardFragment()).commit()
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -58,11 +59,9 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "OnStart: Main")
         if (loggedInUser != null){
-            Log.d(TAG, "hai idhr")
             Log.d(TAG, "User $loggedInUser")
-            redirect()
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
         }else {
-            Log.d(TAG, "Nope")
             val user = mAuth.currentUser
             if (user != null) {
                 showProgressDialog()
@@ -89,8 +88,8 @@ class MainActivity : AppCompatActivity() {
                                                 val jsonObject = gson.toJsonTree(payload[0].getData()).asJsonObject
                                                 loggedInUser = gson.fromJson(jsonObject, User::class.java)
                                                 Log.d(TAG, loggedInUser.toString())
-                                                hideProgressDialog()
-                                                redirect()
+                                                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
+                                              //  redirect()
 
                                             } else {
                                                 hideProgressDialog()
@@ -133,14 +132,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun redirect(){
-        val fragment = HomeFragment()
-        val bundle = Bundle()
-        bundle.putSerializable("loggedInUser", loggedInUser)
-        fragment.arguments = bundle
-        supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, fragment).commit()
-    }
-
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         super.onSaveInstanceState(outState, outPersistentState)
         Log.d(TAG, "OnSaveInstanceState: Main")
@@ -162,22 +153,27 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "OnDestroy: Main")
     }
 
-    private fun showProgressDialog() {
+    fun getLoggedInUser(): User? {
+        return this.loggedInUser
+    }
+
+    fun showProgressDialog() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.progress_dialog, null)
         val loader = dialogView.findViewById<ImageView>(R.id.loadingProgressbar)
         builder.setView(dialogView)
         builder.setCancelable(false)
         dialog = builder.create()
-        dialog!!.window.setLayout(600,400)
         dialog!!.show()
+        dialog!!.window.setLayout(400,400)
+        dialog!!.window.setBackgroundDrawableResource(R.drawable.loader_styles)
         animation = loader.drawable as AnimationDrawable
         animation.start()
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
-    private fun hideProgressDialog(){
+    fun hideProgressDialog(){
         animation.stop()
         dialog!!.dismiss()
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)

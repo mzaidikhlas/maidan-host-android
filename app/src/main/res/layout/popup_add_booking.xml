@@ -72,6 +72,9 @@
     <TextView
         android:id="@+id/from"
         style="@style/radius"
+        android:focusable="true"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         android:layout_width="103dp"
         android:layout_height="58dp"
         android:layout_marginBottom="90dp"
@@ -116,6 +119,9 @@
     <TextView
         android:id="@+id/to"
         style="@style/radius"
+        android:focusable="true"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         android:layout_width="103dp"
         android:layout_height="56dp"
         android:layout_marginBottom="90dp"

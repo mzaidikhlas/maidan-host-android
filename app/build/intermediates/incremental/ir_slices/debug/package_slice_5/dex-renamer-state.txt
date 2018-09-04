@@ -1,4 +1,0 @@
-#Sun Sep 02 06:35:11 PKT 2018
-base.0=/Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/build/intermediates/transforms/dexMerger/debug/22
-path.0=classes.dex
-renamed.0=classes.dex
