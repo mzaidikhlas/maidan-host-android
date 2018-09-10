@@ -2,12 +2,13 @@ package com.maidan.android.host.models
 
 import java.io.Serializable
 
-data class User(private var email: String, private var name: String, private var password: String?,
+data class User(private var ownerDocId: String?, private var email: String, private var name: String, private var password: String?,
                 private var phone: String, private var cnic: String, private var displayAvatar: String?,
                 private var dob: String, private var gender: String, private var isClient: Boolean,
                 private var isOwner: Boolean, private var userRecord: UserRecord?, private var venues: ArrayList<Venue>?): Serializable {
 
     //Getters
+    fun getId(): String?{return this.ownerDocId}
     fun getIsClient():Boolean{return this.isClient}
 
     fun getIsOwner():Boolean{return this.isOwner}
@@ -50,6 +51,7 @@ data class User(private var email: String, private var name: String, private var
     fun getVenues(): ArrayList<Venue>? { return this.venues }
 
     //Setters
+    fun setId(ownerDocId: String){this.ownerDocId = ownerDocId}
     fun setVenues(venues: ArrayList<Venue>){ this.venues = venues }
 
     fun setIsClient(isClient: Boolean){this.isClient = isClient}

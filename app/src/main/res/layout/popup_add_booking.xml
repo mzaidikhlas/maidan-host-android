@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp">
@@ -46,14 +47,15 @@
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="12dp"
-        android:inputType="text"
         android:hint="Name"
+        android:inputType="text"
         android:paddingStart="10dp"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintVertical_chainStyle="spread_inside" />
 
     <TextView
         android:id="@+id/textView2"
@@ -64,7 +66,7 @@
         android:text="FROM"
         android:textColor="@color/grey"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/from"
+        app:layout_constraintBottom_toTopOf="@+id/date_from"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
@@ -72,20 +74,19 @@
     <TextView
         android:id="@+id/from"
         style="@style/radius"
-        android:focusable="true"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
         android:layout_width="103dp"
         android:layout_height="58dp"
-        android:layout_marginBottom="90dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginStart="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:hint="12:00"
         android:paddingStart="10dp"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/date_from" />
 
 
     <TextView
@@ -93,10 +94,12 @@
         android:layout_width="13dp"
         android:layout_height="59dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
         android:text="-"
         android:textColor="@color/grey"
         android:textSize="44sp"
         app:layout_constraintEnd_toStartOf="@+id/to"
+        app:layout_constraintHorizontal_bias="0.59"
         app:layout_constraintStart_toEndOf="@+id/from"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -115,38 +118,63 @@
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
+    <TextView
+        android:id="@+id/date_from"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:text="7th September 2018"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/from"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+
+    <TextView
+        android:id="@+id/date_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="72dp"
+        android:text="7th September 2018"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/to"
+        app:layout_constraintStart_toEndOf="@+id/date_from"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
 
     <TextView
         android:id="@+id/to"
         style="@style/radius"
-        android:focusable="true"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
         android:layout_width="103dp"
         android:layout_height="56dp"
-        android:layout_marginBottom="90dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="52dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:hint="3:00"
         android:paddingStart="10dp"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/date_to" />
 
     <Button
         android:id="@+id/book"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginEnd="116dp"
         android:layout_marginStart="116dp"
         android:background="@drawable/book_gradient"
+        android:fontFamily="@font/montserrat_regular"
         android:padding="10dp"
         android:text="BOOK"
-        android:textSize="16sp"
-        android:fontFamily="@font/montserrat_regular"
         android:textColor="@color/white"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

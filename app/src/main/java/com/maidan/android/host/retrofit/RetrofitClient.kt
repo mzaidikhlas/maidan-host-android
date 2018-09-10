@@ -17,3 +17,4 @@ object RetrofitClient {
             return retrofit!!
         }
 }
+//https://maidan-d79d9.firebaseapp.com/api/

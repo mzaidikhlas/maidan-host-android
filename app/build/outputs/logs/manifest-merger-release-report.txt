@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
 MERGED from [com.firebaseui:firebase-ui-auth:4.0.0] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/firebase-ui-auth-4.0.0.aar/b87a96570e4674558cb82dce9d575ef0/AndroidManifest.xml:2:1-93:12
 MERGED from [com.android.support:design:27.1.1] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/design-27.1.1.aar/1c6de8f3648536412827f41f9369140b/AndroidManifest.xml:17:1-22:12
 MERGED from [com.github.AnyChart:AnyChart-Android:1.0.1] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/AnyChart-Android-1.0.1.aar/249dde93aa7e773af31a6aa1d553b196/AndroidManifest.xml:2:1-17:12
@@ -62,25 +62,25 @@ MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/wasifnadeem/.gradle/ca
 MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/viewmodel-1.1.1.aar/c48bd47e170cf76bdff0bce8935e77b2/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:cardview-v7:27.1.1] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/cardview-v7-27.1.1.aar/3b1d8a8906bbc0e05d46c3ee11458f5c/AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.android.gms:play-services-measurement-base:16.0.2] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/play-services-measurement-base-16.0.2.aar/c49144c9811f3f8ad9284d17a185020a/AndroidManifest.xml:2:1-9:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
-INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
+INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
 	package
 		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:3:5-38
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
 	android:versionName
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
 	android:versionCode
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-25:12
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:1-24:12
 		INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:2:11-69
 application
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:5:5-23:19
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:5:5-22:19
 MERGED from [com.firebaseui:firebase-ui-auth:4.0.0] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/firebase-ui-auth-4.0.0.aar/b87a96570e4674558cb82dce9d575ef0/AndroidManifest.xml:15:5-91:19
 MERGED from [com.firebaseui:firebase-ui-auth:4.0.0] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/firebase-ui-auth-4.0.0.aar/b87a96570e4674558cb82dce9d575ef0/AndroidManifest.xml:15:5-91:19
 MERGED from [com.github.AnyChart:AnyChart-Android:1.0.1] /Users/wasifnadeem/.gradle/caches/transforms-1/files-1.1/AnyChart-Android-1.0.1.aar/249dde93aa7e773af31a6aa1d553b196/AndroidManifest.xml:11:5-15:19
@@ -163,28 +163,24 @@ ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/
 		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:14:13-45
 	android:name
 		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:13:13-41
-activity#com.maidan.android.host.LoadingActivity
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:15:9-53
-	android:name
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:15:19-50
 activity#com.maidan.android.host.SignupDetailsActivity
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:16:9-59
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:15:9-59
 	android:name
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:16:19-56
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:15:19-56
 activity#com.maidan.android.host.LoginActivity
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:17:9-22:20
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:16:9-21:20
 	android:name
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:17:19-48
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:16:19-48
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:18:13-21:29
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:17:13-20:29
 action#android.intent.action.MAIN
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:19:17-69
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:18:17-69
 	android:name
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:19:25-66
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:18:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:20:17-77
+ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:19:17-77
 	android:name
-		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:20:27-74
+		ADDED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml:19:27-74
 uses-sdk
 INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/wasifnadeem/Documents/Projects/Maidan/Android/Maidan_Host/app/src/main/AndroidManifest.xml

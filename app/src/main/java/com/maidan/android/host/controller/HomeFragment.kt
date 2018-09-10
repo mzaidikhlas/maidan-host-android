@@ -62,10 +62,6 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "OnCreate")
 
-        if (savedInstanceState != null) {
-            Log.d(TAG, "OnCreate: save state")
-            showProgressDialog()
-        }else Log.d(TAG, "OnCreate: no state")
         loggedInUser = (activity as MainActivity).getLoggedInUser()
         Log.d(TAG, loggedInUser.toString())
 
@@ -81,8 +77,10 @@ class HomeFragment : Fragment() {
 
         val view = if (view != null) view else inflater.inflate(R.layout.fragment_home, container, false)
 
-        if (savedInstanceState != null) {
-            Log.d(TAG, "A rha hai")
+        if ((activity as MainActivity).getFragmentCount() == 0)
+            (activity as MainActivity).setFragmentCount(1)
+        else{
+            Log.d(TAG, "Idhr b nhe aya")
             showProgressDialog()
         }
 
@@ -95,7 +93,8 @@ class HomeFragment : Fragment() {
         //Venues spinner init
         Log.d(TAG,"Logged in user $loggedInUser")
         val spinnerArray = ArrayList<String>()
-        if (loggedInUser!!.getVenues() != null) {
+        if (loggedInUser!!.getVenues()!!.isNotEmpty()) {
+            Log.d(TAG, "venues hai :/")
             for (item: Venue in loggedInUser!!.getVenues()!!)
                 spinnerArray.add(item.getName())
 
@@ -114,6 +113,7 @@ class HomeFragment : Fragment() {
                 }
             }
         }else {
+            Log.d(TAG, "venues nahe hai :/")
             hideProgressDialog()
             Log.d(TAG, "No venues")
             Toast.makeText(context, "You dont have added any ground please ask maidan team for updates", Toast.LENGTH_LONG).show()
@@ -199,14 +199,15 @@ class HomeFragment : Fragment() {
         }else{
             Log.d(TAG, "No state")
         }
-
         currentUser.getIdToken(true).addOnCompleteListener{task ->
             if (task.isSuccessful){
                 val idToken = task.result.token
                 val apiService: ApiInterface = RetrofitClient.instance.create(ApiInterface::class.java)
-                val call: Call<ApiResponse> = apiService.getBookingsByOwnerPhone(currentUser.phoneNumber!!, idToken!!)
+                Log.d(TAG, "Doc id ${loggedInUser!!.getId()}")
+                val call: Call<ApiResponse> = apiService.getBookingsByOwnerPhone(loggedInUser!!.getId()!!, idToken!!)
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
+                        Log.d(TAG, "in token generation call")
                         hideProgressDialog()
                         Toast.makeText(context, "Error $t", Toast.LENGTH_LONG).show()
                         Log.d(TAG, "Error $t")
@@ -228,6 +229,7 @@ class HomeFragment : Fragment() {
                                             val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
                                             Log.d(TAG, "Json$jsonObject")
                                             booking = gson.fromJson(jsonObject, Booking::class.java)
+                                            booking.setRef(payload[0].getDocId())
                                             bookings!!.add(booking)
 
                                             if (booking.getVenue().getName() == venueName)
@@ -255,6 +257,10 @@ class HomeFragment : Fragment() {
                         }
                     }
                 })
+            }else{
+                Log.d(TAG, "Exception ${task.exception}")
+                hideProgressDialog()
+                Log.d(TAG, "in task in completion")
             }
         }
     }

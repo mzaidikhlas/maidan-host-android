@@ -12,7 +12,6 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" />
-        <activity android:name=".LoadingActivity" />
         <activity android:name=".SignupDetailsActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>

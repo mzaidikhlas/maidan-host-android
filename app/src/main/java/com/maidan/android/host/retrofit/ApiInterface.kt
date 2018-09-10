@@ -7,9 +7,6 @@ import retrofit2.http.*
 
 interface ApiInterface {
     //User Routes
-    @GET("user/getByEmail")
-    fun getUserInfoByEmail(@Header("Authorization") idToken: String): Call<ApiResponse>
-
     @GET("user/getByPhone")
     fun getUserInfoByPhone(@Query("phone") phone: String, @Header("Authorization") idToken: String ): Call<ApiResponse>
 
@@ -39,8 +36,8 @@ interface ApiInterface {
     @GET("booking/getBookingsByOwner")
     fun getBookingsByOwner(@Header("Authorization") idToken: String): Call<ApiResponse>
 
-    @GET("booking/getBookingsByOwnerPhone")
-    fun getBookingsByOwnerPhone(@Query("phone") phone: String, @Header("Authorization") idToken: String): Call<ApiResponse>
+    @GET("booking/getOwnerVenuesBookings")
+    fun getBookingsByOwnerPhone(@Query("id") id: String, @Header("Authorization") idToken: String): Call<ApiResponse>
 
 
     //Venue Routes

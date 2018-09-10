@@ -31,7 +31,6 @@
         <activity
             android:name="com.maidan.android.host.MainActivity"
             android:label="@string/app_name" />
-        <activity android:name="com.maidan.android.host.LoadingActivity" />
         <activity android:name="com.maidan.android.host.SignupDetailsActivity" />
         <activity android:name="com.maidan.android.host.LoginActivity" >
             <intent-filter>

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import java.util.ArrayList
 import com.maidan.android.host.R
 import com.anychart.enums.HoverMode
 import com.anychart.enums.TooltipPositionMode
@@ -144,7 +143,7 @@ class StatsFragment: Fragment() {
             if (task.isSuccessful){
                 val idToken = task.result.token
                 val apiService: ApiInterface = RetrofitClient.instance.create(ApiInterface::class.java)
-                val call: Call<ApiResponse> = apiService.getBookingsByOwnerPhone(currentUser.phoneNumber!!, idToken!!)
+                val call: Call<ApiResponse> = apiService.getBookingsByOwnerPhone(loggedInUser!!.getId()!!, idToken!!)
                 call.enqueue(object: Callback<ApiResponse> {
                     override fun onFailure(call: Call<ApiResponse>?, t: Throwable?) {
                         hideProgressDialog()
@@ -203,11 +202,12 @@ class StatsFragment: Fragment() {
         var sat = 0.0
         var sun = 0.0
         if (bookings != null){
-            var date: ArrayList<String>
-            var total: Float
+            var date: List<String>
+            var total = 0F
             for (booking: Booking in bookings!!){
+                Log.d(TAG, "Booking $booking")
                 total = booking.getTransaction()!!.getTotal()
-                date = booking.getBookingDate().split(",") as ArrayList<String>
+                date = booking.getBookingDate().split(",")
                 when (date[0]){
                     "Monday" -> mon += total
                     "Tuesday" -> tus += total

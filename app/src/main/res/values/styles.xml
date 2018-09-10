@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -67,7 +67,7 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="venueSpinner" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+    <style name="venueSpinner">
         <item name="android:background">@drawable/light_green_to_dark_green_1</item>
         <item name="android:popupBackground">@drawable/light_green_to_dark_green_1</item>
         <item name="android:textAlignment">center</item>
@@ -81,5 +81,14 @@
     <style name="gradient_button">
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@drawable/nav_gradient</item>
+    </style>
+
+    <style name="amenities_checkbox">
+        <item name="android:background">@drawable/green_border</item>
+        <item name="android:textColor">@drawable/light_green_to_dark_green_1</item>
+    </style>
+
+    <style name="bookpopup">
+        <item name="android:background">@drawable/bookpopup_border</item>
     </style>
 </resources>

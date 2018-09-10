@@ -1,12 +1,8 @@
 package com.maidan.android.host.controller
 
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.FragmentManager
-import android.app.TimePickerDialog
+import android.app.*
 import android.content.Context
-import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -32,6 +28,7 @@ import com.maidan.android.host.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,6 +44,11 @@ class DailyBookingFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var venuesSpinner: Spinner
     private lateinit var backBtn: Button
+    private lateinit var dateTo_btn:TextView
+    private lateinit var dateFrom_btn: TextView
+    private var dateString: String? = null
+    private lateinit var datePicker : DatePickerDialog
+    private lateinit var date_to: TextView
 
     private var availableSlotsFrom: ArrayList<Int>? = null
     private var availableSlotsTo: ArrayList<Int>? = null
@@ -127,6 +129,8 @@ class DailyBookingFragment : Fragment() {
             venuesSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View?, position: Int, id: Long) {
                     val selectedItem = venuesSpinner.getItemAtPosition(position)
+
+                    Log.d(TAG, "Selected item $selectedItem")
                     //Getting bookings from db
                     showProgressDialog()
                     setBookings(selectedItem as String)
@@ -222,6 +226,7 @@ class DailyBookingFragment : Fragment() {
                                     if (bookings == null)
                                         bookings = ArrayList()
                                     showAddBookingPopup()
+//                                    booking.setRef(response.body()!!.getPayload()[0].getDocId())
                                     bookings!!.add(booking)
                                     setBookings(venuesSpinner.selectedItem as String)
                                     popupAddBooking.hide()
@@ -256,19 +261,49 @@ class DailyBookingFragment : Fragment() {
         newBookingFromTxt = popupAddBooking.findViewById(R.id.from)
         newBookingToTxt = popupAddBooking.findViewById(R.id.to)
         bookNow = popupAddBooking.findViewById(R.id.book)
+        dateTo_btn = popupAddBooking.findViewById(R.id.date_to)
+        dateFrom_btn = popupAddBooking.findViewById(R.id.date_from)
+
+        val c: Calendar = Calendar.getInstance()
+        val year = c.get(Calendar.YEAR)
+        val month = c.get(Calendar.MONTH)
+        val day = c.get(Calendar.DAY_OF_MONTH)
 
         bookNow.letterSpacing = 0.3F
 
         if (fromTimeSeconds == null)
             newBookingToTxt.isEnabled = false
 
+        dateTo_btn.text = dt
+        dateFrom_btn.text = dt
+        dateTo_btn.setOnClickListener {
+            var selectedCalender: Calendar? = null
+
+            datePicker = DatePickerDialog(context,R.style.DatePickerTheme,
+                    DatePickerDialog.OnDateSetListener { view, yr, monthOfYear, dayOfMonth ->
+
+                        selectedCalender = Calendar.getInstance()
+                        selectedCalender!!.set(yr,monthOfYear,dayOfMonth)
+                        val selectedDate = DateFormat.getDateInstance(DateFormat.FULL).format(selectedCalender!!.time)
+
+                        dateString = selectedDate
+                        dateTo_btn.text = dateString
+                    },year,month,day)
+            if (selectedCalender != null){
+                datePicker.datePicker.updateDate(selectedCalender!!.get(Calendar.YEAR), selectedCalender!!.get(Calendar.MONTH)
+                        , selectedCalender!!.get(Calendar.DAY_OF_MONTH))
+            }
+            datePicker.datePicker.minDate = c.timeInMillis
+            datePicker.show()
+        }
+
         bookNow.setOnClickListener {
             Log.d(TAG, "Book")
             if (newBookingFromTxt.text.isNotEmpty() && newBookingToTxt.text.isNotEmpty() && newBookingNameTxt.text.isNotEmpty()) {
-                if (availabiltyCheck(fromTimeSeconds!!,toTimeSeconds!!)){}
-
                 if (toTimeSeconds!! > fromTimeSeconds!!){
                     bookNow.isEnabled = false
+                    newBookingToTxt.error = null
+                    newBookingToTxt.clearFocus()
                     var venue: Venue? = null
                     for (venueItem: Venue in loggedInUser!!.getVenues()!!){
                         if (venueItem.getName() == venuesSpinner.selectedItem) {
@@ -284,20 +319,31 @@ class DailyBookingFragment : Fragment() {
                     val total = pricePerHr + convenienceFee + taxes
 
                     //Initializing transaction object
-                    val transaction = Transaction(convenienceFee, playHrs, pricePerHr, total, taxes, "manualCashReceiving")
+                    val transaction = Transaction(convenienceFee, playHrs, pricePerHr, total, taxes, "manualCashReceiving",
+                            "walk-in")
                     Log.d(TAG, "Transaction $transaction")
 
 
                     if (availabiltyFromCheck(fromTimeSeconds!!) && availabiltyToCheck(toTimeSeconds!!)){
-                        //Initializing booking object
-                        val newBooking = Booking(venue,transaction,loggedInUser!!,
-                                newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, "booked")
+                        if (availabiltyCheck(fromTimeSeconds!!, toTimeSeconds!!)) {
+                            newBookingToTxt.error = null
+                            newBookingToTxt.clearFocus()
+                            //Initializing booking object
+                            val newBooking = Booking(null, venue, transaction, loggedInUser!!,
+                                    newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, dateTo_btn.text.toString(),"booked")
 
-                        //Creating new booking in db
-                        createBooking(newBooking)
+                            //Creating new booking in db
+                            createBooking(newBooking)
+                        }else{
+                            bookNow.isEnabled = true
+                            newBookingToTxt.error = "This time slot is unavailable"
+                            newBookingToTxt.requestFocus()
+                        }
                     }
                 }else{
+                    bookNow.isEnabled = true
                     newBookingToTxt.error = "Please enter correct time"
+                    newBookingToTxt.requestLayout()
                 }
             }
             else{
@@ -324,6 +370,9 @@ class DailyBookingFragment : Fragment() {
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
                         //Converting time in seconds for validation check
+                        c.time = DateFormat.getDateInstance(DateFormat.FULL).parse(dt)
+                        c.set(Calendar.HOUR_OF_DAY, hr)
+                        c.set(Calendar.MINUTE, min)
                         fromTimeSeconds = ((hr*3600)+(min*60))
 
                         if (!availabiltyFromCheck(fromTimeSeconds!!)){
@@ -339,10 +388,7 @@ class DailyBookingFragment : Fragment() {
 
                         Log.d(TAG, "From time $fromTimeSeconds")
 
-                        Log.d(TAG, "Hour: $hr, Min: $min")
-                        h = hr
-                        m = min
-                        val timeString = "$hr:$min"
+                        val timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
                         newBookingFromTxt.text = timeString
                     }, hourOfDay, minute, false)
             timePickerDialog.updateTime(h,m)
@@ -359,6 +405,11 @@ class DailyBookingFragment : Fragment() {
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
                     TimePickerDialog.OnTimeSetListener { view, hr, min ->
                         //Converting time in seconds for validation check
+
+                        c.time = DateFormat.getDateInstance(DateFormat.FULL).parse(dateTo_btn.text.toString())
+                        c.set(Calendar.HOUR_OF_DAY, hr)
+                        c.set(Calendar.MINUTE, min)
+
                         toTimeSeconds = ((hr*3600)+(min*60))
 
                         if (!availabiltyToCheck(toTimeSeconds!!)){
@@ -374,10 +425,7 @@ class DailyBookingFragment : Fragment() {
 
                         Log.d(TAG, "To time $toTimeSeconds")
 
-                        Log.d(TAG, "Hour: $hr, Min: $min")
-                        h = hr
-                        m = min
-                        val timeString = "$hr:$min"
+                        val timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
                         newBookingToTxt.text = timeString
                     }, hourOfDay, minute, false)
             timePickerDialog.updateTime(h,m)
@@ -390,29 +438,47 @@ class DailyBookingFragment : Fragment() {
         var i = 0
         var flag = false
 
-        while (i < availableSlotsFrom!!.size){
-            if (from >= availableSlotsFrom!![i])
-                if (from <= availableSlotsTo!![i])
-                    flag = true
-            i++
-        }
+        if (dt == dateTo_btn.text) {
+            while (i < availableSlotsFrom!!.size) {
+                if (from >= availableSlotsFrom!![i]) {
+                    if (from < availableSlotsTo!![i])
+                        flag = true
+                }
+                i++
+            }
+        }else flag = true
         return flag
     }
     private fun availabiltyToCheck(to: Int): Boolean{
         var i = 0
         var flag = false
 
-        while (i < availableSlotsTo!!.size){
-            if (to <= availableSlotsTo!![i])
-                if (to >= availableSlotsFrom!![i])
-                    flag = true
-            i++
-        }
+        if (dt == dateTo_btn.text) {
+            while (i < availableSlotsTo!!.size) {
+                if (to < availableSlotsTo!![i]) {
+                    if (to >= availableSlotsFrom!![i])
+                        flag = true
+                }
+                i++
+            }
+        }else flag = true
         return flag
     }
 
     private fun availabiltyCheck(from:Int, to:Int): Boolean{
-        return true
+        val count = if (availableSlotsFrom!!.size > availableSlotsTo!!.size) availableSlotsFrom!!.size else availableSlotsTo!!.size
+        var i = 0
+        var flag = false
+        if (dt == dateTo_btn.text) {
+            while (i < count) {
+                if (from >= availableSlotsFrom!![i]) {
+                    if (to <= availableSlotsTo!![i])
+                        flag = true
+                }
+                i++
+            }
+        }else flag = true
+        return flag
     }
 
     //Populating layout with bookings
@@ -420,13 +486,18 @@ class DailyBookingFragment : Fragment() {
         val filteredBookings: ArrayList<Booking> = ArrayList()
         availableSlotsFrom = ArrayList()
         availableSlotsTo = ArrayList()
-
+        Log.d(TAG, "Bookings $bookings")
         if (bookings != null){
             var timeFrom:ArrayList<String>
             var timeTo:ArrayList<String>
             var temp = 0
             for(booking: Booking in bookings!!){
+                Log.d(TAG, "Booking venue ${booking.getVenue().getName()}")
+                Log.d(TAG, "Venue name $venueName")
+                Log.d(TAG, "Booking date ${booking.getBookingDate()}")
+                Log.d(TAG, "Date $dt")
                 if ((booking.getVenue().getName() == venueName) && (booking.getBookingDate() == dt)) {
+                    Log.d(TAG, "1")
                     filteredBookings.add(booking)
 
                     //Parsing dates
@@ -443,22 +514,29 @@ class DailyBookingFragment : Fragment() {
                     temp = timeToInSeconds
                 }
             }
-            availableSlotsFrom!!.add(temp)
-            availableSlotsTo!!.add(86400)
+            if (filteredBookings.isNotEmpty()) {
+                availableSlotsFrom!!.add(temp)
+                availableSlotsTo!!.add(86400)
 
-            availableSlotsFrom!!.sort()
-            availableSlotsTo!!.sort()
-            Log.d(TAG, "Avail from $availableSlotsFrom")
-            Log.d(TAG, "Avail to $availableSlotsTo")
+                availableSlotsFrom!!.sort()
+                availableSlotsTo!!.sort()
+                Log.d(TAG, "Avail from $availableSlotsFrom")
+                Log.d(TAG, "Avail to $availableSlotsTo")
 
-            hideProgressDialog()
-            bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
-            bookingsRecycler.adapter.notifyDataSetChanged()
+                hideProgressDialog()
+                bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
+                bookingsRecycler.adapter.notifyDataSetChanged()
+            }else{
+                availableSlotsFrom!!.add(0)
+                availableSlotsTo!!.add(86400)
+                hideProgressDialog()
+                Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
+            }
         }else{
             availableSlotsFrom!!.add(0)
             availableSlotsTo!!.add(86400)
             hideProgressDialog()
-            Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "No bookings found", Toast.LENGTH_SHORT).show()
         }
     }
 

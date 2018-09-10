@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
@@ -22,9 +23,6 @@ import retrofit2.Response
 import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.auth.FirebaseUser
-import com.maidan.android.host.models.Location
-import com.maidan.android.host.models.Rate
-import com.maidan.android.host.models.Venue
 import java.util.*
 
 
@@ -58,6 +56,7 @@ class SignupDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup_details)
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         mAuth = FirebaseAuth.getInstance()
         mStorageRef = FirebaseStorage.getInstance().reference
@@ -135,20 +134,20 @@ class SignupDetailsActivity : AppCompatActivity() {
             }else{
                 progressBar.visibility = View.INVISIBLE
                 submitBtn.isEnabled = true
-                cnicTxt.error = "required"
-                cnicTxt.requestFocus()
-
-                emailTxt.error = "required"
-                emailTxt.requestFocus()
-
-                nameTxt.error = "required"
-                nameTxt.requestFocus()
-
-                emailTxt.error = "required"
-                emailTxt.requestFocus()
-
-                dobTxt.error = "required"
-                dobTxt.requestFocus()
+//                cnicTxt.error = "required"
+//                cnicTxt.requestFocus()
+//
+//                emailTxt.error = "required"
+//                emailTxt.requestFocus()
+//
+//                nameTxt.error = "required"
+//                nameTxt.requestFocus()
+//
+//                emailTxt.error = "required"
+//                emailTxt.requestFocus()
+//
+//                dobTxt.error = "required"
+//                dobTxt.requestFocus()
                 Toast.makeText(applicationContext, "All Fields are required", Toast.LENGTH_LONG).show()
             }
         }
@@ -204,28 +203,28 @@ class SignupDetailsActivity : AppCompatActivity() {
     }
 
     private fun createUser (avatar: String?){
-        val venue = Venue("Venue 1",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-            ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-        val venue2 = Venue("Venue 2",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-                ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-
-        val venue3 = Venue("Venue 3",
-                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-                ,null, true, null, null, "Cricket",
-                Rate(1500, 100, 100, 2,8),
-                3, "32123","123123")
-        val venues = ArrayList<Venue>()
-        venues.add(venue)
-        venues.add(venue2)
-        venues.add(venue3)
-        user = User(emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
-                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, venues)
+//        val venue = Venue("Venue 1",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//            ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//        val venue2 = Venue("Venue 2",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//                ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//
+//        val venue3 = Venue("Venue 3",
+//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
+//                ,null, true, null, null, "Cricket",
+//                Rate(1500, 100, 100, 2,8),
+//                3, "32123","123123")
+//        val venues = ArrayList<Venue>()
+//        venues.add(venue)
+//        venues.add(venue2)
+//        venues.add(venue3)
+        user = User(null,emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
+                dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, null)
 
         Log.d(TAG, "User: $user")
 

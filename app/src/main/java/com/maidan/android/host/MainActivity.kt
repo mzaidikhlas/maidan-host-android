@@ -8,14 +8,12 @@ import android.os.PersistableBundle
 import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
-import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
-import com.maidan.android.host.controller.DashboardFragment
+import com.maidan.android.host.controller.SettingsFragment
 import com.maidan.android.host.controller.HomeFragment
 import com.maidan.android.host.controller.StatsFragment
 import com.maidan.android.host.models.User
@@ -26,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private var loggedInUser: User? = null
     private val TAG = "MainActivity"
+    private var fragmentCallCount = 0
 
     private val mOnNavigationItemSelectedListener = OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
-                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, DashboardFragment()).commit()
+                supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, SettingsFragment()).commit()
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "OnStart: Main")
         if (loggedInUser != null){
             Log.d(TAG, "User $loggedInUser")
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
+//            supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
         }else {
             val user = mAuth.currentUser
             if (user != null) {
@@ -87,10 +87,12 @@ class MainActivity : AppCompatActivity() {
                                                 val gson = Gson()
                                                 val jsonObject = gson.toJsonTree(payload[0].getData()).asJsonObject
                                                 loggedInUser = gson.fromJson(jsonObject, User::class.java)
+
+                                                if (loggedInUser != null){
+                                                    (loggedInUser as User).setId(payload[0].getDocId())
+                                                }
                                                 Log.d(TAG, loggedInUser.toString())
                                                 supportFragmentManager.beginTransaction().replace(R.id.fragment_layout, HomeFragment()).commit()
-                                              //  redirect()
-
                                             } else {
                                                 hideProgressDialog()
                                                 val intent = Intent(applicationContext, SignupDetailsActivity::class.java)
@@ -99,12 +101,16 @@ class MainActivity : AppCompatActivity() {
                                             }
                                         }
                                     } else {
-                                        mAuth.signOut()
-                                        Toast.makeText(applicationContext, "OnCode: ${response.body()!!.getStatusCode()}", Toast.LENGTH_LONG).show()
                                         hideProgressDialog()
-                                        val intent = Intent(applicationContext, LoginActivity::class.java)
+                                        val intent = Intent(applicationContext, SignupDetailsActivity::class.java)
                                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                         startActivity(intent)
+//                                        mAuth.signOut()
+//                                        Toast.makeText(applicationContext, "OnCode: ${response.body()!!.getStatusCode()}", Toast.LENGTH_LONG).show()
+//                                        hideProgressDialog()
+//                                        val intent = Intent(applicationContext, LoginActivity::class.java)
+//                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                                        startActivity(intent)
                                     }
                                 } else {
                                     mAuth.signOut()
@@ -143,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "OnCreate: Main")
-
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         mAuth = FirebaseAuth.getInstance()
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
@@ -178,5 +184,8 @@ class MainActivity : AppCompatActivity() {
         dialog!!.dismiss()
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
+
+    fun getFragmentCount (): Int {return this.fragmentCallCount}
+    fun setFragmentCount(count: Int){this.fragmentCallCount = count}
 }
 
