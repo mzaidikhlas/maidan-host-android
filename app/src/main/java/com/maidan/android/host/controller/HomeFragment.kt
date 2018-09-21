@@ -123,7 +123,7 @@ class HomeFragment : Fragment() {
         val c: Calendar = Calendar.getInstance()
         val dateFormat = DateFormat.getDateInstance(DateFormat.FULL).format(c.time)
         Log.d(TAG, "Date format $dateFormat")
-        homeCalender.setOnDateChangeListener { calenderView, y, m, d ->
+        homeCalender.setOnDateChangeListener { _, y, m, d ->
             val selectedCalender = Calendar.getInstance()
             selectedCalender.set(y,m,d)
             val selectedDate = DateFormat.getDateInstance(DateFormat.FULL).format(selectedCalender.time)
@@ -225,14 +225,23 @@ class HomeFragment : Fragment() {
                                         var booking: Booking
                                         bookings = ArrayList()
                                         displayBookings = ArrayList()
+                                        val tempCalendar: Calendar = Calendar.getInstance()
+                                        val today = tempCalendar.timeInMillis
+                                        Log.d(TAG, "First day of weak ${tempCalendar.get(Calendar.WEEK_OF_MONTH)}")
+                                        tempCalendar.set(Calendar.DAY_OF_WEEK, 7)
+                                        Log.d(TAG, "Last day of weak ${tempCalendar.time}")
                                         for (item: PayloadFormat in payload) {
                                             val jsonObject = gson.toJsonTree(item.getData()).asJsonObject
                                             Log.d(TAG, "Json$jsonObject")
                                             booking = gson.fromJson(jsonObject, Booking::class.java)
                                             booking.setRef(payload[0].getDocId())
                                             bookings!!.add(booking)
+                                            tempCalendar.time = DateFormat.getDateInstance(DateFormat.FULL).parse(booking.getBookingDate())
 
-                                            if (booking.getVenue().getName() == venueName)
+                                            Log.d(TAG, "Booking date ${booking.getBookingDate()}")
+                                            Log.d(TAG, "today time in milis $today")
+                                            Log.d(TAG, "Temp calender ${tempCalendar.timeInMillis}")
+                                            if ((booking.getVenue().getName() == venueName) && (today <= tempCalendar.timeInMillis) )
                                                 displayBookings.add(booking)
                                         }
                                         Log.d(TAG, "Bookings call $bookings")

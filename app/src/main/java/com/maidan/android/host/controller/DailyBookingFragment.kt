@@ -39,21 +39,14 @@ class DailyBookingFragment : Fragment() {
     private lateinit var bookingsRecycler: RecyclerView
     private lateinit var newBookingNameTxt: EditText
     private lateinit var newBookingFromTxt: TextView
-    private lateinit var newBookingToTxt: TextView
     private lateinit var bookNow: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var venuesSpinner: Spinner
     private lateinit var backBtn: Button
-    private lateinit var dateTo_btn:TextView
-    private lateinit var dateFrom_btn: TextView
-    private var dateString: String? = null
-    private lateinit var datePicker : DatePickerDialog
-    private lateinit var date_to: TextView
-
-    private var availableSlotsFrom: ArrayList<Int>? = null
-    private var availableSlotsTo: ArrayList<Int>? = null
+    private lateinit var dateTo: Spinner
 
     private var dt: String? = null
+    private var today: Date? = null
     private val TAG = "BookingDailyFragment"
     private var count = 1
 
@@ -85,6 +78,10 @@ class DailyBookingFragment : Fragment() {
             dt = arguments!!.getString("date")
             bookings = arguments!!.get("bookings") as ArrayList<Booking>?
         } else Log.d(TAG, "Arguments empty")
+
+        val c = Calendar.getInstance()
+        today = c.time
+        Log.d(TAG, "Time ${c.time}")
 
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth.currentUser!!
@@ -133,7 +130,7 @@ class DailyBookingFragment : Fragment() {
                     Log.d(TAG, "Selected item $selectedItem")
                     //Getting bookings from db
                     showProgressDialog()
-                    setBookings(selectedItem as String)
+                    filterBookings(selectedItem as String)
                 }
 
                 override fun onNothingSelected(parentView: AdapterView<*>) {
@@ -226,9 +223,8 @@ class DailyBookingFragment : Fragment() {
                                     if (bookings == null)
                                         bookings = ArrayList()
                                     showAddBookingPopup()
-//                                    booking.setRef(response.body()!!.getPayload()[0].getDocId())
                                     bookings!!.add(booking)
-                                    setBookings(venuesSpinner.selectedItem as String)
+                                    filterBookings(venuesSpinner.selectedItem as String)
                                     popupAddBooking.hide()
                                     Toast.makeText(context,"New Booking created", Toast.LENGTH_LONG).show()
 
@@ -259,103 +255,72 @@ class DailyBookingFragment : Fragment() {
         popupAddBooking.setContentView(R.layout.popup_add_booking)
         newBookingNameTxt = popupAddBooking.findViewById(R.id.name)
         newBookingFromTxt = popupAddBooking.findViewById(R.id.from)
-        newBookingToTxt = popupAddBooking.findViewById(R.id.to)
         bookNow = popupAddBooking.findViewById(R.id.book)
-        dateTo_btn = popupAddBooking.findViewById(R.id.date_to)
-        dateFrom_btn = popupAddBooking.findViewById(R.id.date_from)
-
-        val c: Calendar = Calendar.getInstance()
-        val year = c.get(Calendar.YEAR)
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
+        dateTo = popupAddBooking.findViewById(R.id.toHours)
 
         bookNow.letterSpacing = 0.3F
 
-        if (fromTimeSeconds == null)
-            newBookingToTxt.isEnabled = false
-
-        dateTo_btn.text = dt
-        dateFrom_btn.text = dt
-        dateTo_btn.setOnClickListener {
-            var selectedCalender: Calendar? = null
-
-            datePicker = DatePickerDialog(context,R.style.DatePickerTheme,
-                    DatePickerDialog.OnDateSetListener { view, yr, monthOfYear, dayOfMonth ->
-
-                        selectedCalender = Calendar.getInstance()
-                        selectedCalender!!.set(yr,monthOfYear,dayOfMonth)
-                        val selectedDate = DateFormat.getDateInstance(DateFormat.FULL).format(selectedCalender!!.time)
-
-                        dateString = selectedDate
-                        dateTo_btn.text = dateString
-                    },year,month,day)
-            if (selectedCalender != null){
-                datePicker.datePicker.updateDate(selectedCalender!!.get(Calendar.YEAR), selectedCalender!!.get(Calendar.MONTH)
-                        , selectedCalender!!.get(Calendar.DAY_OF_MONTH))
-            }
-            datePicker.datePicker.minDate = c.timeInMillis
-            datePicker.show()
-        }
-
         bookNow.setOnClickListener {
             Log.d(TAG, "Book")
-            if (newBookingFromTxt.text.isNotEmpty() && newBookingToTxt.text.isNotEmpty() && newBookingNameTxt.text.isNotEmpty()) {
-                if (toTimeSeconds!! > fromTimeSeconds!!){
+
+
+
+            if (newBookingFromTxt.text.isNotEmpty() && newBookingNameTxt.text.isNotEmpty()) {
+
+                //Parsing play hours
+                val playHrs = dateTo.selectedItem.toString().split(" ")
+
+                //Time date calculations
+                val temp = Calendar.getInstance()
+                //From Time
+                temp.time = DateFormat.getDateInstance(DateFormat.FULL).parse(dt)
+                val time = newBookingFromTxt.text.toString().split(":")
+                temp.set(Calendar.HOUR, time[0].toInt())
+                temp.set(Calendar.MINUTE, time[1].toInt())
+                val from = temp.time
+                val fromDate = DateFormat.getDateInstance(DateFormat.FULL).format(temp.time)
+                val fromTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(temp.time)
+
+                //To time
+                temp.set(Calendar.HOUR, (temp.get(Calendar.HOUR) + playHrs[0].toInt()))
+                val to = temp.time
+                val toTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(temp.time)
+                val toDate = DateFormat.getDateInstance(DateFormat.FULL).format(temp.time)
+                //Finish
+
+                if (slotCheck(from, to)) {
                     bookNow.isEnabled = false
-                    newBookingToTxt.error = null
-                    newBookingToTxt.clearFocus()
+                    //Fetching venue object
                     var venue: Venue? = null
-                    for (venueItem: Venue in loggedInUser!!.getVenues()!!){
+                    for (venueItem: Venue in loggedInUser!!.getVenues()!!) {
                         if (venueItem.getName() == venuesSpinner.selectedItem) {
                             venue = venueItem
                             break
                         }
                     }
                     //Calculating bills
-                    val playHrs: Float =  ((toTimeSeconds!! - fromTimeSeconds!!)/3600).toFloat()
-                    val pricePerHr: Float = playHrs*venue!!.getRate().getPerHrRate()
-                    val convenienceFee: Float = pricePerHr/venue.getRate().getVendorServiceFee()
+                    val pricePerHr: Float = playHrs[0].toFloat() * venue!!.getRate().getPerHrRate()
+                    val convenienceFee: Float = pricePerHr / venue.getRate().getVendorServiceFee()
                     val taxes = 0F
                     val total = pricePerHr + convenienceFee + taxes
 
                     //Initializing transaction object
-                    val transaction = Transaction(convenienceFee, playHrs, pricePerHr, total, taxes, "manualCashReceiving",
+                    val transaction = Transaction(convenienceFee, playHrs[0].toFloat(), pricePerHr, total, taxes, "manualCashReceiving",
                             "walk-in")
                     Log.d(TAG, "Transaction $transaction")
 
+                    //Initializing booking object
+                    val newBooking = Booking(null, venue, transaction, loggedInUser!!,
+                            toTime, fromTime, fromDate, toDate, "booked", to, from)
 
-                    if (availabiltyFromCheck(fromTimeSeconds!!) && availabiltyToCheck(toTimeSeconds!!)){
-                        if (availabiltyCheck(fromTimeSeconds!!, toTimeSeconds!!)) {
-                            newBookingToTxt.error = null
-                            newBookingToTxt.clearFocus()
-                            //Initializing booking object
-                            val newBooking = Booking(null, venue, transaction, loggedInUser!!,
-                                    newBookingToTxt.text.toString(), newBookingFromTxt.text.toString(), dt!!, dateTo_btn.text.toString(),"booked")
-
-                            //Creating new booking in db
-                            createBooking(newBooking)
-                        }else{
-                            bookNow.isEnabled = true
-                            newBookingToTxt.error = "This time slot is unavailable"
-                            newBookingToTxt.requestFocus()
-                        }
-                    }
+                    //Creating new booking in db
+                    createBooking(newBooking)
                 }else{
                     bookNow.isEnabled = true
-                    newBookingToTxt.error = "Please enter correct time"
-                    newBookingToTxt.requestLayout()
+                    Toast.makeText(context, "This slot is unavailable", Toast.LENGTH_SHORT).show()
                 }
             }
             else{
-//                if (newBookingToTxt.text.isNullOrEmpty()){
-//                    newBookingToTxt.error = "Time required"
-//                }
-//                if (newBookingFromTxt.text.isNullOrEmpty()){
-//                    newBookingFromTxt.error = "Time required"
-//                }
-//                if (newBookingNameTxt.text.isNullOrEmpty()){
-//                    newBookingNameTxt.error = "Name required"
-//                }
                 Toast.makeText(context, "All fields are required", Toast.LENGTH_LONG).show()
             }
         }
@@ -364,177 +329,66 @@ class DailyBookingFragment : Fragment() {
             val c = Calendar.getInstance()
             val hourOfDay = c.get(Calendar.HOUR_OF_DAY)
             val minute = c.get(Calendar.MINUTE)
-            var h = hourOfDay
-            var m = minute
+
             // Launch Time Picker Dialog
             val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
-                    TimePickerDialog.OnTimeSetListener { view, hr, min ->
+                    TimePickerDialog.OnTimeSetListener { _, hr, min ->
                         //Converting time in seconds for validation check
                         c.time = DateFormat.getDateInstance(DateFormat.FULL).parse(dt)
-                        c.set(Calendar.HOUR_OF_DAY, hr)
+                        c.set(Calendar.HOUR, hr)
                         c.set(Calendar.MINUTE, min)
-                        fromTimeSeconds = ((hr*3600)+(min*60))
 
-                        if (!availabiltyFromCheck(fromTimeSeconds!!)){
-                            newBookingFromTxt.error = "This slot is not available"
-                            newBookingFromTxt.requestFocus()
-                        }
-                        else {
-                            newBookingToTxt.isEnabled = true
-                            Log.d(TAG, "From true")
+                        if (today!! <= c.time){
                             newBookingFromTxt.error = null
                             newBookingFromTxt.clearFocus()
+
+                            val timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
+                            newBookingFromTxt.text = timeString
+                        }else{
+                            newBookingFromTxt.error = "Enter valid time"
+                            newBookingFromTxt.requestFocus()
                         }
-
-                        Log.d(TAG, "From time $fromTimeSeconds")
-
-                        val timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
-                        newBookingFromTxt.text = timeString
                     }, hourOfDay, minute, false)
-            timePickerDialog.updateTime(h,m)
-            timePickerDialog.show()
-
-        }
-        newBookingToTxt.setOnClickListener {
-            val c = Calendar.getInstance()
-            val hourOfDay = c.get(Calendar.HOUR_OF_DAY)
-            val minute = c.get(Calendar.MINUTE)
-            var h = hourOfDay
-            var m = minute
-            // Launch Time Picker Dialog
-            val timePickerDialog = TimePickerDialog(context,R.style.DatePickerTheme,
-                    TimePickerDialog.OnTimeSetListener { view, hr, min ->
-                        //Converting time in seconds for validation check
-
-                        c.time = DateFormat.getDateInstance(DateFormat.FULL).parse(dateTo_btn.text.toString())
-                        c.set(Calendar.HOUR_OF_DAY, hr)
-                        c.set(Calendar.MINUTE, min)
-
-                        toTimeSeconds = ((hr*3600)+(min*60))
-
-                        if (!availabiltyToCheck(toTimeSeconds!!)){
-                            Log.d(TAG, "To false")
-                            newBookingToTxt.error = "This slot is not available"
-                            newBookingToTxt.requestFocus()
-                        }
-                        else {
-                            Log.d(TAG, "To true")
-                            newBookingToTxt.error = null
-                            newBookingToTxt.clearFocus()
-                        }
-
-                        Log.d(TAG, "To time $toTimeSeconds")
-
-                        val timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
-                        newBookingToTxt.text = timeString
-                    }, hourOfDay, minute, false)
-            timePickerDialog.updateTime(h,m)
             timePickerDialog.show()
         }
         popupAddBooking.show()
     }
 
-    private fun availabiltyFromCheck(from: Int): Boolean{
+    private fun slotCheck(from: Date?, to: Date?): Boolean {
+        var flag = true
         var i = 0
-        var flag = false
-
-        if (dt == dateTo_btn.text) {
-            while (i < availableSlotsFrom!!.size) {
-                if (from >= availableSlotsFrom!![i]) {
-                    if (from < availableSlotsTo!![i])
-                        flag = true
+        if (bookings != null) {
+            while (i < bookings!!.size){
+                val startB = bookings!![i].getFrom()
+                val endB = bookings!![i].getTo()
+                if ((from!! <= endB) && (to!! >= startB)){
+                    flag = false
+                    break
                 }
                 i++
             }
-        }else flag = true
-        return flag
-    }
-    private fun availabiltyToCheck(to: Int): Boolean{
-        var i = 0
-        var flag = false
-
-        if (dt == dateTo_btn.text) {
-            while (i < availableSlotsTo!!.size) {
-                if (to < availableSlotsTo!![i]) {
-                    if (to >= availableSlotsFrom!![i])
-                        flag = true
-                }
-                i++
-            }
-        }else flag = true
+        }
         return flag
     }
 
-    private fun availabiltyCheck(from:Int, to:Int): Boolean{
-        val count = if (availableSlotsFrom!!.size > availableSlotsTo!!.size) availableSlotsFrom!!.size else availableSlotsTo!!.size
-        var i = 0
-        var flag = false
-        if (dt == dateTo_btn.text) {
-            while (i < count) {
-                if (from >= availableSlotsFrom!![i]) {
-                    if (to <= availableSlotsTo!![i])
-                        flag = true
-                }
-                i++
-            }
-        }else flag = true
-        return flag
-    }
-
-    //Populating layout with bookings
-    private fun setBookings(venueName: String) {
-        val filteredBookings: ArrayList<Booking> = ArrayList()
-        availableSlotsFrom = ArrayList()
-        availableSlotsTo = ArrayList()
-        Log.d(TAG, "Bookings $bookings")
+    private fun filterBookings(venueName: String) {
+        val filteredBookings: ArrayList<Booking>
         if (bookings != null){
-            var timeFrom:ArrayList<String>
-            var timeTo:ArrayList<String>
-            var temp = 0
-            for(booking: Booking in bookings!!){
-                Log.d(TAG, "Booking venue ${booking.getVenue().getName()}")
-                Log.d(TAG, "Venue name $venueName")
-                Log.d(TAG, "Booking date ${booking.getBookingDate()}")
-                Log.d(TAG, "Date $dt")
+            filteredBookings = ArrayList()
+            for (booking: Booking in bookings!!){
                 if ((booking.getVenue().getName() == venueName) && (booking.getBookingDate() == dt)) {
-                    Log.d(TAG, "1")
                     filteredBookings.add(booking)
-
-                    //Parsing dates
-                    timeFrom = booking.getStartTime().split(":") as ArrayList<String>
-                    timeTo = booking.getDurationOfBooking().split(":") as ArrayList<String>
-
-                    //Converting dates in seconds to do some calculations
-                    val timeFromInSeconds = ((timeFrom[0].toInt() * 3600) + (timeFrom[1].toInt() * 60))
-                    val timeToInSeconds = ((timeTo[0].toInt() * 3600) + (timeTo[1].toInt() * 60))
-
-                    //Make available slots list
-                    availableSlotsFrom!!.add(temp)
-                    availableSlotsTo!!.add(timeFromInSeconds)
-                    temp = timeToInSeconds
                 }
             }
-            if (filteredBookings.isNotEmpty()) {
-                availableSlotsFrom!!.add(temp)
-                availableSlotsTo!!.add(86400)
-
-                availableSlotsFrom!!.sort()
-                availableSlotsTo!!.sort()
-                Log.d(TAG, "Avail from $availableSlotsFrom")
-                Log.d(TAG, "Avail to $availableSlotsTo")
-
+            if (filteredBookings.isNotEmpty()){
                 hideProgressDialog()
                 bookingsRecycler.adapter = DateBookingAdapter(filteredBookings)
                 bookingsRecycler.adapter.notifyDataSetChanged()
             }else{
-                availableSlotsFrom!!.add(0)
-                availableSlotsTo!!.add(86400)
                 hideProgressDialog()
                 Toast.makeText(context, "No booking found of this date", Toast.LENGTH_SHORT).show()
             }
         }else{
-            availableSlotsFrom!!.add(0)
-            availableSlotsTo!!.add(86400)
             hideProgressDialog()
             Toast.makeText(context, "No bookings found", Toast.LENGTH_SHORT).show()
         }

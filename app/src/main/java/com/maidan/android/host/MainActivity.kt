@@ -150,6 +150,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d(TAG, "OnCreate: Main")
         this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
         mAuth = FirebaseAuth.getInstance()
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }

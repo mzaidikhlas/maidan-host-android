@@ -27,6 +27,22 @@
         <item>Monthly</item>
     </string-array>
 
+    <!-- Dropdown list -->
+    <string-array name="match_overs">
+        <item>1 hour</item>
+        <item>2 hour</item>
+        <item>3 hour</item>
+        <item>4 hour</item>
+        <item>5 hour</item>
+        <item>6 hour</item>
+        <item>7 hour</item>
+        <item>8 hour</item>
+        <item>9 hour</item>
+        <item>10 hour</item>
+
+    </string-array>
+
+
     <string name="Book">BOOK</string>
     <string name="logintoyour">LOGIN TO YOUR</string>
     <string name="maidan">MAIDAN</string>

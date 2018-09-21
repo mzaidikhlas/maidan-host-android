@@ -1,12 +1,16 @@
 package com.maidan.android.host.models
 
 import java.io.Serializable
+import java.util.*
 
 data class Booking(private var ref: String?, private var venue: Venue, private var transaction: Transaction?, private var user: User,
                    private var durationOfBooking: String, private var startTime: String, private var bookingDate: String,
-                   private var toBookingDate: String?, private var status: String): Serializable {
+                   private var toBookingDate: String?, private var status: String,
+                   private var to: Date?, private var from: Date?): Serializable {
 
     //Getters
+    fun getTo():Date? {return this.to}
+    fun getFrom():Date? {return this.from}
     fun getToBookingDate():String?{return this.toBookingDate}
     fun getRef(): String? {return this.ref}
     fun getVenue(): Venue {return this.venue}
@@ -18,6 +22,8 @@ data class Booking(private var ref: String?, private var venue: Venue, private v
     fun getStatus(): String {return this.status}
 
     //Setters
+    fun setTo(to: Date?) { this.to = to}
+    fun setFrom(from: Date?) { this.from = from}
     fun setToBookingDate(toBookingDate: String){this.toBookingDate = toBookingDate}
     fun setRef(ref: String){this.ref = ref}
     fun setVenue(venue: Venue){this.venue = venue}

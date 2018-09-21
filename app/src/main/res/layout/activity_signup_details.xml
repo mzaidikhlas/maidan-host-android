@@ -11,9 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
-
     <ProgressBar
         android:id="@+id/signupProgressBar"
         style="?android:attr/progressBarStyle"
@@ -36,7 +33,7 @@
         android:layout_marginEnd="75dp"
         android:layout_marginStart="75dp"
         android:layout_marginTop="14dp"
-        android:hint="JOHN APPLESEED"
+        android:hint="Name"
         android:inputType="text"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -51,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="32dp"
-        android:hint="johnappeseed@gmail.com"
+        android:hint="Email Address"
         android:inputType="textEmailAddress"
         android:textColorHint="@color/white"
         android:textColor="@color/white"
@@ -71,7 +68,6 @@
         android:layout_marginStart="140dp"
         android:layout_marginTop="80dp"
         android:contentDescription="User avatar"
-        android:paddingStart="45dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -83,7 +79,7 @@
         style="@style/email_password_login"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:paddingTop="10dp"
+        android:paddingTop="14dp"
         android:layout_marginEnd="36dp"
         android:layout_marginStart="36dp"
         android:textAlignment="textStart"
@@ -96,63 +92,65 @@
         app:layout_constraintTop_toBottomOf="@+id/email" />
 
 
-    <Spinner
-        android:id="@+id/gender"
-        style="@style/email_password_login"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:entries="@array/gender"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/DOB" />
+        <Spinner
+            android:id="@+id/gender"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="8dp"
+            android:entries="@array/gender"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/DOB" />
 
-    <EditText
-        android:id="@+id/phonenumber"
-        style="@style/email_password_login"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:inputType="phone"
-        android:hint="Phone Number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gender" />
+        <EditText
+            android:id="@+id/phonenumber"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="8dp"
+            android:hint="Phone Number"
+            android:inputType="phone"
+            android:maxLength="13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gender" />
 
-    <EditText
-        android:id="@+id/CNIC"
-        style="@style/email_password_login"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="16dp"
-        android:maxLength="13"
-        android:inputType="number"
-        android:hint="CNIC"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phonenumber" />
+        <EditText
+            android:id="@+id/CNIC"
+            style="@style/email_password_login"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="8dp"
+            android:hint="CNIC"
+            android:inputType="number"
+            android:maxLength="13"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/phonenumber" />
 
-    <Button
-        android:id="@+id/signup_submit_btn"
-        style="@style/radius"
-        android:layout_width="107dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="73dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginStart="148dp"
-        android:text="SUBMIT"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CNIC" />
+        <Button
+            android:id="@+id/signup_submit_btn"
+            style="@style/radius"
+            android:layout_width="107dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="73dp"
+            android:layout_marginEnd="148dp"
+            android:layout_marginStart="148dp"
+            android:layout_marginTop="16dp"
+            android:text="SUBMIT"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/CNIC" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

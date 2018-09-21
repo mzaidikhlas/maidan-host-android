@@ -24,9 +24,9 @@
         style="@style/venueSpinner"
         android:layout_width="match_parent"
         android:layout_height="59dp"
-        android:elevation="8dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/light_green_to_dark_green_1"
+        android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,7 +36,6 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="167dp"
-        android:layout_marginTop="8dp"
         android:background="@drawable/nav_gradient"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

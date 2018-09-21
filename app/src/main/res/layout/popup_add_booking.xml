@@ -66,7 +66,6 @@
         android:text="FROM"
         android:textColor="@color/grey"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/date_from"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
@@ -78,6 +77,7 @@
         android:layout_height="58dp"
         android:layout_marginBottom="60dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -86,7 +86,7 @@
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/date_from" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
 
     <TextView
@@ -94,11 +94,10 @@
         android:layout_width="13dp"
         android:layout_height="59dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="16dp"
         android:text="-"
         android:textColor="@color/grey"
         android:textSize="44sp"
-        app:layout_constraintEnd_toStartOf="@+id/to"
+        app:layout_constraintEnd_toStartOf="@+id/toHours"
         app:layout_constraintHorizontal_bias="0.59"
         app:layout_constraintStart_toEndOf="@+id/from"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -109,7 +108,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="100dp"
         android:layout_marginStart="175dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="TO"
         android:textColor="@color/grey"
         android:textSize="14sp"
@@ -118,50 +117,22 @@
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/name" />
 
-    <TextView
-        android:id="@+id/date_from"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
-        android:text="7th September 2018"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/from"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-
-    <TextView
-        android:id="@+id/date_to"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="72dp"
-        android:text="7th September 2018"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/to"
-        app:layout_constraintStart_toEndOf="@+id/date_from"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-
-    <TextView
-        android:id="@+id/to"
+    <Spinner
+        android:id="@+id/toHours"
         style="@style/radius"
         android:layout_width="103dp"
         android:layout_height="56dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="70dp"
         android:layout_marginEnd="52dp"
         android:clickable="true"
+        android:entries="@array/match_overs"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:hint="3:00"
         android:paddingStart="10dp"
-        android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/date_to" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <Button
         android:id="@+id/book"
@@ -178,5 +149,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>

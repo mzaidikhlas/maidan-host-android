@@ -57,7 +57,7 @@ class SignupDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup_details)
         this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         mAuth = FirebaseAuth.getInstance()
         mStorageRef = FirebaseStorage.getInstance().reference
 
@@ -77,13 +77,15 @@ class SignupDetailsActivity : AppCompatActivity() {
         // Date of Birth DatePicker
         dobTxt.setOnClickListener {
             val c = Calendar.getInstance()
+            val maxTime = c.timeInMillis
+            c.set(1990,1,1)
             val year = c.get(Calendar.YEAR)
             val month = c.get(Calendar.MONTH)
             val day = c.get(Calendar.DAY_OF_MONTH)
 
             dateString = "$day/$month/$year"
 
-            dobPicker = DatePickerDialog(this,android.R.style.Theme_Holo_Dialog,
+            dobPicker = DatePickerDialog(this,android.R.style.Theme_Holo_Light_Dialog,
                     DatePickerDialog.OnDateSetListener { view, yr, monthOfYear, dayOfMonth ->
                         Log.d(TAG, "Year: $yr, Month $monthOfYear, Day: $dayOfMonth")
 
@@ -91,6 +93,7 @@ class SignupDetailsActivity : AppCompatActivity() {
                         dateString = "$dayOfMonth/$monthOfYear/$yr"
                         dobTxt.text = dateString
                     },year,month,day)
+            dobPicker.datePicker.maxDate = maxTime
             dobPicker.show()
             Log.d(TAG,dateString)
         }
@@ -114,15 +117,30 @@ class SignupDetailsActivity : AppCompatActivity() {
 
                 var validationFlag = true
 
+                if(phoneNumberTxt.length() < 10) {
+                    phoneNumberTxt.error = "Valid Phone Number is required"
+                    phoneNumberTxt.requestFocus()
+                    validationFlag = false
+                }else{
+                    phoneNumberTxt.error = null
+                    phoneNumberTxt.clearFocus()
+                }
+
                 if (cnicTxt.length() < 13) {
                     cnicTxt.error = "Valid cnic is required"
                     cnicTxt.requestFocus()
                     validationFlag = false
+                }else{
+                    cnicTxt.error = null
+                    cnicTxt.clearFocus()
                 }
                 if (!emailTxt.text.contains("@")) {
                     emailTxt.error = "Enter valid email address"
                     emailTxt.requestFocus()
                     validationFlag = false
+                }else{
+                    emailTxt.error = null
+                    emailTxt.clearFocus()
                 }
                 if (validationFlag){
                     if (imageUri != null) uploadImage() else createUser(null)
@@ -181,9 +199,9 @@ class SignupDetailsActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
 
-        val riversRef = mStorageRef.child("avatar/${currentUser.uid}")
+        val avatar = mStorageRef.child("host/avatar/${currentUser.uid}")
 
-        riversRef.putFile(imageUri!!)
+        avatar.putFile(imageUri!!)
                 .addOnSuccessListener { taskSnapshot ->
                     progressDialog.dismiss()
                     // Get a URL to the uploaded content
@@ -203,26 +221,6 @@ class SignupDetailsActivity : AppCompatActivity() {
     }
 
     private fun createUser (avatar: String?){
-//        val venue = Venue("Venue 1",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//            ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//        val venue2 = Venue("Venue 2",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//                ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//
-//        val venue3 = Venue("Venue 3",
-//                Location(28.70837, 77.195427, "Pakistan", "Lahore", "Model Town")
-//                ,null, true, null, null, "Cricket",
-//                Rate(1500, 100, 100, 2,8),
-//                3, "32123","123123")
-//        val venues = ArrayList<Venue>()
-//        venues.add(venue)
-//        venues.add(venue2)
-//        venues.add(venue3)
         user = User(null,emailTxt.text.toString(), nameTxt.text.toString(), null, phoneNumberTxt.text.toString(), cnicTxt.text.toString(), avatar,
                 dobTxt.text.toString(), genderSpinner.selectedItem.toString(), false, true, null, null)
 
